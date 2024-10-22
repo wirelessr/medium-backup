@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>How to Make a Technical Selection?</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">How to Make a Technical Selection?</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+There are so many tradeoffs, how to carry on?
+</section>
+<section data-field="body" class="e-content">
+<section name="df6d" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="526d" id="526d" class="graf graf--h3 graf--leading graf--title">How to Make a Technical Selection?</h3><h4 name="4470" id="4470" class="graf graf--h4 graf-after--h3 graf--subtitle">There are so many tradeoffs, how to carry on?</h4><figure name="9187" id="9187" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*6FYZM1uKNUSB3jTu" data-width="1000" data-height="667" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*6FYZM1uKNUSB3jTu"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@victoriano" data-href="https://unsplash.com/@victoriano" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Victoriano Izquierdo</a> on <a href="https://unsplash.com/photos/JG35CpZLfVs" data-href="https://unsplash.com/photos/JG35CpZLfVs" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="b42b" id="b42b" class="graf graf--p graf-after--figure">Last week, an engineer asked me how to make a technical selection. And he provided a real-world example. Their organization wanted to implement an event-driven architecture, and there were three options available right now — MQTT, AMQP, and Kafka — but he didn’t know how to make a decision.</p><p name="adbe" id="adbe" class="graf graf--p graf-after--p">My answer, as always, was “it depends”.</p><blockquote name="128c" id="128c" class="graf graf--blockquote graf--startsWithDoubleQuote graf-after--p"><em class="markup--em markup--blockquote-em">“Everything in software architecture is a tradeoff”. — Mark Richards</em></blockquote><p name="dad5" id="dad5" class="graf graf--p graf-after--blockquote">Because of the tradeoffs, there will never be a standard answer, in other words, there will never be a silver bullet.</p><p name="a60b" id="a60b" class="graf graf--p graf-after--p">However, we always have to make a decision, what are the tradeoffs? At that moment, I turned back to him and asked.</p><ul class="postList"><li name="52db" id="52db" class="graf graf--li graf-after--p">Do you understand your requirements completely?</li><li name="89d7" id="89d7" class="graf graf--li graf-after--li">Do you know what these three techniques are exactly doing?</li></ul><p name="8f56" id="8f56" class="graf graf--p graf-after--li">Take message queues as an example, I have written an article previously on what use cases to consider when choosing a message queue.</p><div name="9f4a" id="9f4a" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://selectfrom.dev/message-queue-in-redis-9efe0de2c39c" data-href="https://selectfrom.dev/message-queue-in-redis-9efe0de2c39c" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://selectfrom.dev/message-queue-in-redis-9efe0de2c39c"><strong class="markup--strong markup--mixtapeEmbed-strong">Message Queue in Redis</strong><br><em class="markup--em markup--mixtapeEmbed-em">Introduce what consideration in choosing a message queue and how to accomplish message queue in Redis.</em>selectfrom.dev</a><a href="https://selectfrom.dev/message-queue-in-redis-9efe0de2c39c" class="js-mixtapeImage mixtapeImage u-ignoreBlock" data-media-id="943e2cdc6ab950cddcb976fab5ac277a" data-thumbnail-img-id="1*o68_P7KksDT9gt13nouN_g.png" style="background-image: url(https://cdn-images-1.medium.com/fit/c/160/160/1*o68_P7KksDT9gt13nouN_g.png);"></a></div><ul class="postList"><li name="3e28" id="3e28" class="graf graf--li graf-after--mixtapeEmbed">Propagation: Can fan-out be supported?</li><li name="5d43" id="5d43" class="graf graf--li graf-after--li">Delivery: What kind of delivery guarantee does it have? At least once or exactly once?</li><li name="c253" id="c253" class="graf graf--li graf-after--li">Persistence: Can messages be persisted?</li><li name="1f57" id="1f57" class="graf graf--li graf-after--li">Consumer group: Does the receiver scale horizontally?</li></ul><p name="87c0" id="87c0" class="graf graf--p graf-after--li">These are the generic requirements for a message queue, and even if you don’t choose a message queue, listing the generic requirements for a technical stack can more or less filter out some options.</p><p name="2301" id="2301" class="graf graf--p graf-after--p">Then, after filtering by generic requirements, further filtering could be done based on the specific use cases. For instance.</p><ul class="postList"><li name="2d03" id="2d03" class="graf graf--li graf-after--p">Is there a large volume of messages to be written?</li><li name="ec92" id="ec92" class="graf graf--li graf-after--li">Is there a limit to the bandwidth that can be transferred?</li><li name="1b14" id="1b14" class="graf graf--li graf-after--li">What kind of security is required?</li><li name="831d" id="831d" class="graf graf--li graf-after--li">What programming languages are expected to be integrated?</li></ul><p name="b006" id="b006" class="graf graf--p graf-after--li">To answer questions such as these, in addition to a precise understanding of the requirements, we must also have a clear understanding of the technical stack candidates.</p><p name="d276" id="d276" class="graf graf--p graf-after--p">Therefore, architects use a similar thought process when making a technical selection to clarify requirements and learn about the technical stack, and finally make a decision. The decision is not about choosing the latest technique, or just playing around with it as if it works.</p><p name="bda7" id="bda7" class="graf graf--p graf-after--p">Nevertheless, we will always encounter the situation that all needs are well met, after all, nowadays technology is developing rapidly, and many of our needs have already been implemented, so what should we do? Throw the dice?</p><p name="d50e" id="d50e" class="graf graf--p graf-after--p">Wait, you can ask more questions.</p><ul class="postList"><li name="f5c8" id="f5c8" class="graf graf--li graf-after--p">Should we maintain this technical stack ourselves or purchase a managed service?</li><li name="ed33" id="ed33" class="graf graf--li graf-after--li">Is there a budget limit?</li><li name="1c85" id="1c85" class="graf graf--li graf-after--li">How do we monitor it, whether we operate it ourselves or buy a managed service?</li><li name="78db" id="78db" class="graf graf--li graf-after--li">Do we have any experience in using it?</li></ul><p name="3340" id="3340" class="graf graf--p graf-after--li">When there is no more question to ask to filter, then the last thing to do is to choose what we love and love what we choose, and not to waver from one option to another.</p><p name="e56c" id="e56c" class="graf graf--p graf-after--p graf--trailing">Any technical stack from finalization to production environment must go through time, experience and learning in the process of use. If we change our choices easily, it’s hard to become an expert.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/f1b21b24c503"><time class="dt-published" datetime="2023-01-23T01:52:13.851Z">January 23, 2023</time></a>.</p><p><a href="https://medium.com/@lazypro/how-to-make-a-technical-selection-f1b21b24c503" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

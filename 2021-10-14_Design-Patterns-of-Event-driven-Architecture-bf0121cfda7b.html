@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Design Patterns of Event-driven Architecture</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Design Patterns of Event-driven Architecture</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Introduce how to design a scalable, robust, efficient, and fault-tolerant event-driven architecture by leveraging useful design patterns.
+</section>
+<section data-field="body" class="e-content">
+<section name="d05a" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="1704" id="1704" class="graf graf--h3 graf--leading graf--title">Design Patterns of Event-driven Architecture</h3><p name="b6d7" id="b6d7" class="graf graf--p graf-after--h3">According to the <a href="https://www.gartner.com/ngw/globalassets/en/information-technology/documents/top-10-strategic-technology-trends-for-2018.pdf" data-href="https://www.gartner.com/ngw/globalassets/en/information-technology/documents/top-10-strategic-technology-trends-for-2018.pdf" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">report</a>, we can see the event-driven model is a hot topic for the system design. However, designing a good event-driven architecture is quite challenging. We are familiar with the synchronization models, which request and response directly, but the stories are totally different in the asynchronization schemes. Nevertheless, here are some architecture patterns for reference.</p><p name="2fa4" id="2fa4" class="graf graf--p graf-after--p">The blueprint comes from the <a href="https://youtu.be/dc20BQ9izs8" data-href="https://youtu.be/dc20BQ9izs8" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">video</a> and shows the whole vision on a well-defined event-driven architecture.</p><figure name="4448" id="4448" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*__KCJ15dla1qq0Rb.png" data-width="1499" data-height="934" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*__KCJ15dla1qq0Rb.png"><figcaption class="imageCaption"><a href="https://youtu.be/dc20BQ9izs8" data-href="https://youtu.be/dc20BQ9izs8" class="markup--anchor markup--figure-anchor" title="分享連結" rel="noopener" target="_blank">https://youtu.be/dc20BQ9izs8</a></figcaption></figure><p name="9a09" id="9a09" class="graf graf--p graf-after--figure">I will briefly introduce those terminologies in the later sections.</p><h3 name="85d1" id="85d1" class="graf graf--h3 graf-after--p">Channel monitoring pattern</h3><p name="60ce" id="60ce" class="graf graf--p graf-after--h3">The channel monitoring pattern define a role called channel monitor to watch the usage and utilization of the main queue. It monitors some metrics like the amount of pending messages, the amount of consumers and the consuming rate.</p><p name="1b23" id="1b23" class="graf graf--p graf-after--p">Having those metrics helps to understand the workload and the healthy of the system. Moreover, the information can let the system be able to self-healing by adjusting the amount of consumers and throttling the producer.</p><h3 name="fe01" id="fe01" class="graf graf--h3 graf-after--p">Consumer supervisor pattern</h3><p name="428d" id="428d" class="graf graf--p graf-after--h3">This supervisor is responsible for adjusting the amount of consumers. It listens to the channel monitor and determines if the current consumers can handle the events. If the supervisor thinks the throughput of consumers is not enough, it will call more consumers to help, and vise versa.</p><h3 name="af58" id="af58" class="graf graf--h3 graf-after--p">Producer control flow pattern</h3><p name="0acb" id="0acb" class="graf graf--p graf-after--h3">In the previous section, the supervisor improves the throughput by making more consumers. However, if the cost is a concern, using more consumers obviously is infeasible.</p><p name="4ece" id="4ece" class="graf graf--p graf-after--p">Therefore, there is another approach, producer control flow pattern. When the consuming rate cannot align to the producing rate, a controller will send a signal to the producer to slow down the event generation. After the pending events are processed, the producer can disable the throttling to restore the normal state.</p><h3 name="f321" id="f321" class="graf graf--h3 graf-after--p">Thread delegate pattern</h3><p name="70bb" id="70bb" class="graf graf--p graf-after--h3">The thread delegate pattern is a useful pattern not only in the event-driven architecture but the other types of the system design.</p><p name="83da" id="83da" class="graf graf--p graf-after--p">The pattern has two purposes:</p><ol class="postList"><li name="9321" id="9321" class="graf graf--li graf-after--p">Preserve the message order</li><li name="b147" id="b147" class="graf graf--li graf-after--li">Track the metrics of event processing, ex. response time.</li></ol><figure name="3679" id="3679" class="graf graf--figure graf-after--li"><img class="graf-image" data-image-id="0*TzGIitumPt_dW98W.png" data-width="889" data-height="637" src="https://cdn-images-1.medium.com/max/800/0*TzGIitumPt_dW98W.png"><figcaption class="imageCaption"><a href="https://youtu.be/ZM0IFSToceU" data-href="https://youtu.be/ZM0IFSToceU" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">https://youtu.be/ZM0IFSToceU</a></figcaption></figure><p name="2c43" id="2c43" class="graf graf--p graf-after--figure">Let’s begin from the first purpose. When a huge amounts of events enter the queue, we are used to bring up more consumers to handle them, aka scale-out. This method is common in the stateless scenarios. But, some kind of events are stateful, the order of events must be addressed. For instance,</p><ul class="postList"><li name="9616" id="9616" class="graf graf--li graf-after--p">Put some items in the cart</li><li name="0f1b" id="0f1b" class="graf graf--li graf-after--li">Clean up the cart</li><li name="c01f" id="c01f" class="graf graf--li graf-after--li">Put other items in the same cart</li><li name="432a" id="432a" class="graf graf--li graf-after--li">Charge it</li></ul><p name="294c" id="294c" class="graf graf--p graf-after--li">The event order must be kept; otherwise, you may buy the wrong items. Thus, how to handle the events on multiple consumers? In thread delegate pattern, it introduces a new role, event dispatcher, and the dispatcher dispatch an event to the corresponding consumer based on the event type. In other words, all events with the same type will be in the same place, and the order can be ensured.</p><p name="d82b" id="d82b" class="graf graf--p graf-after--p">So, the dispatcher maintains a mapping table to record which type of event belongs to who. After the consumer finishes an event, it callback to the dispatcher. The dispatcher knows all processing results of consumers, i.e., it can track the response time as well.</p><h3 name="d8fe" id="d8fe" class="graf graf--h3 graf-after--p">Workflow event pattern</h3><p name="57b0" id="57b0" class="graf graf--p graf-after--h3">When event consumer encounter an error while processing, it may not fix the error due to many reasons like the malformed event, transaction conflicts, etc. Hence, the consumer emit this event to another queue handled by workflow processor. The processor will either fix the event or store the event in the storage. In addition, the processor can display the event on the dashboard and inform the human to take over the case. The human can fix the situation manually and resend this event to the queue.</p><p name="39ac" id="39ac" class="graf graf--p graf-after--p">It is worth to mention that if the event is resent to the queue, the order cannot be guaranteed.</p><h3 name="8452" id="8452" class="graf graf--h3 graf-after--p">Summary</h3><p name="efe1" id="efe1" class="graf graf--p graf-after--h3 graf--trailing">We walk through several design patterns of an event-driven architecture. We can design a self-monitoring and self-healing system leverage those patterns. The system is scalable, robust, efficient, and fault-tolerant. However, there are some noteworthy patterns that have not been covered. I will introduce them in the future.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/bf0121cfda7b"><time class="dt-published" datetime="2021-10-14T09:45:39.165Z">October 14, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/design-patterns-of-event-driven-architecture-bf0121cfda7b" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

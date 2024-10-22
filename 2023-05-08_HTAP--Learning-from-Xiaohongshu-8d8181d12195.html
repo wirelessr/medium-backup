@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>HTAP: Learning from Xiaohongshu</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">HTAP: Learning from Xiaohongshu</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Why choose TiDB? What problems does TiDB solve?
+</section>
+<section data-field="body" class="e-content">
+<section name="aed4" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="d094" id="d094" class="graf graf--h3 graf--leading graf--title">HTAP: Learning from Xiaohongshu</h3><h4 name="a877" id="a877" class="graf graf--h4 graf-after--h3 graf--subtitle">Why choose TiDB? What problems does TiDB solve?</h4><figure name="6f01" id="6f01" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*9saB7metHP8ItHMN.png" data-width="256" data-height="256" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*9saB7metHP8ItHMN.png"><figcaption class="imageCaption"><a href="https://en.wikipedia.org/wiki/Xiaohongshu" data-href="https://en.wikipedia.org/wiki/Xiaohongshu" class="markup--anchor markup--figure-anchor" rel="nofollow noopener" target="_blank">https://en.wikipedia.org/wiki/Xiaohongshu</a></figcaption></figure><p name="5bf4" id="5bf4" class="graf graf--p graf-after--figure">Before explaining the process of importing HTAP into Xiaohongshu, let’s briefly introduce Xiaohongshu.</p><p name="e9a1" id="e9a1" class="graf graf--p graf-after--p">Xiaohongshu is known as the Chinese version of Instagram, but in addition to the usual social functions such as video and image sharing, it also includes an e-commerce platform. According to the official website of Xiaohongshu, as of 2019, active users have exceeded 100 million.</p><p name="73e5" id="73e5" class="graf graf--p graf-after--p">It is both a social media and e-commerce website, and the amount of data generated each day is in the billions. In order to support data-driven decision making, these massive amounts of data must go through multiple layers of cleansing, transformation and aggregation, and more importantly, the real-time nature of decision making also need to address.</p><p name="4c4c" id="4c4c" class="graf graf--p graf-after--p">In addition, Xiaohongshu’s application scenarios and user numbers continue to grow, so the scalability of the entire data infrastructure is also a major challenge.</p><p name="c151" id="c151" class="graf graf--p graf-after--p">In the end, Xiaohongshu adopted TiDB as their real-time streaming storage.</p><h3 name="a0da" id="a0da" class="graf graf--h3 graf-after--p">Why Xiaohongshu chose TiDB?</h3><p name="8b16" id="8b16" class="graf graf--p graf-after--h3">In fact, Xiaohongshu already adopted TiDB for some projects in 2017, but it was widely used until 2018.</p><p name="3474" id="3474" class="graf graf--p graf-after--p">The three main reasons are as follows.</p><ol class="postList"><li name="a1b3" id="a1b3" class="graf graf--li graf-after--p">Due to data-driven decision-making, there will be various OLAP needs of ad hoc queries, so the traditional OLTP database can not support the use.</li><li name="9b5a" id="9b5a" class="graf graf--li graf-after--li">Many OLAP databases can handle queries efficiently, but the write performance is not good, while TiDB write also has great performance.</li><li name="700d" id="700d" class="graf graf--li graf-after--li">In the scenario of horizontal scaling of data clusters, new instances must be available as fast as possible. TiDB keeps datasets consistent across all instances through a Raft majority mechanism.</li></ol><p name="77d0" id="77d0" class="graf graf--p graf-after--li">Now, TiDB has been widely used in various domains of Xiaohongshu, including</p><ul class="postList"><li name="dec8" id="dec8" class="graf graf--li graf-after--p">Data warehouse application</li><li name="8c32" id="8c32" class="graf graf--li graf-after--li">Report Analysis</li><li name="459f" id="459f" class="graf graf--li graf-after--li">Real-time dashboard for sales promotion</li><li name="076a" id="076a" class="graf graf--li graf-after--li">Anti-fraud detection</li><li name="980f" id="980f" class="graf graf--li graf-after--li">etc.</li></ul><h3 name="36bf" id="36bf" class="graf graf--h3 graf-after--li">Past Pain Points</h3><p name="0295" id="0295" class="graf graf--p graf-after--h3">In general, the entire data architecture is as follows.</p><figure name="4be3" id="4be3" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*8t96Yr5MrHeWT-bR78vUyw.png" data-width="1124" data-height="1316" src="https://cdn-images-1.medium.com/max/800/1*8t96Yr5MrHeWT-bR78vUyw.png"></figure><p name="4f55" id="4f55" class="graf graf--p graf-after--figure">There are three typical use cases in such an architecture with poor performance.</p><p name="6715" id="6715" class="graf graf--p graf-after--p">Firstly, ad hoc queries are performed on the production database. To avoid increasing the overhead on the production database, a complete copy of the production database must be made, and all ad hoc queries are run on the replica.</p><p name="e1a0" id="e1a0" class="graf graf--p graf-after--p">However, the MySQL for production uses sharding, which creates a high complexity in operation. In addition to the difficulty of operation, the implementation of aggregation, such as <code class="markup--code markup--p-code">group by</code>, <code class="markup--code markup--p-code">join</code>, etc., on the middleware of sharding also leads to the complexity of implementation, and on the other hand, the transactions on the sharding MySQL is also a big challenge.</p><p name="caf9" id="caf9" class="graf graf--p graf-after--p">Secondly, in order to query reports more efficiently, report analysis is generated through pre-aggregation and stored in a standalone MySQL to avoid the latency of Hadoop direct query. However, since it is pre-aggregated, it cannot effectively respond to requirement changes. Moreover, a standalone MySQL has less scalability due to the lack of sharding.</p><p name="2211" id="2211" class="graf graf--p graf-after--p">Finally, to perform anti-fraud detection in various application scenarios, it must rely on the data stored in the data lake, which is not real-time, but <code class="markup--code markup--p-code">T + 1</code> ingestion. This makes it impossible for anti-fraud to work within time, and even if fraud is detected, the damage is already done.</p><h3 name="0a0d" id="0a0d" class="graf graf--h3 graf-after--p">Solution</h3><p name="095f" id="095f" class="graf graf--p graf-after--h3">The answer to these three cases is TiDB.</p><figure name="eb9b" id="eb9b" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*_9aV89MWqv2uvlBuY2531g.png" data-width="1144" data-height="748" src="https://cdn-images-1.medium.com/max/800/1*_9aV89MWqv2uvlBuY2531g.png"></figure><p name="6e90" id="6e90" class="graf graf--p graf-after--figure">In the use case of ad hoc query, there are two pain points must be dealt with, one is the difficulty of operation, and the other is the complexity of implementation. Then, just put all the data into TiDB and maintain one TiDB. Because TiDB fully supports MySQL 5.7, so it can be synchronized by MySQL binlog.</p><p name="c87f" id="c87f" class="graf graf--p graf-after--p">Of course, it is not as simple as that. To put the sharding databases into TiDB, it needs to process the data properly, i.e. merge them into one big wide table. Therefore, it needs to deal with the issues of merging and auto-incrementing primary keys in the streaming. But eventually, all the production databases will be synchronized with TiDB, and even for the data volume of Xiaohongshu, the synchronization delay is within 1 second.</p><p name="79e9" id="79e9" class="graf graf--p graf-after--p">Then, the same practice can be applied to report analysis and anti-fraud.</p><p name="3757" id="3757" class="graf graf--p graf-after--p">Because of real-time streaming, anti-fraud no longer takes <code class="markup--code markup--p-code">T + 1</code> time to respond, and real-time streaming can be handled directly through Flink SQL. On the other hand, report analysis is easier because all the data is available and can be operated on a single database.</p><h3 name="d68b" id="d68b" class="graf graf--h3 graf-after--p">New Problem Occurred</h3><p name="48ab" id="48ab" class="graf graf--p graf-after--h3">When TiDB was first introduced, the version of TiDB used in Xiaohongshu was <code class="markup--code markup--p-code">3.x</code>.</p><p name="515c" id="515c" class="graf graf--p graf-after--p">TiDB <code class="markup--code markup--p-code">3.x</code> is still a row-based storage engine, and although it can achieve good performance in OLAP, it is still not good enough for large data volume. Furthermore, all scenarios use the same TiDB cluster which cannot isolate ad hoc queries and production applications.</p><p name="9286" id="9286" class="graf graf--p graf-after--p">But these problems are solved after upgrading to TiDB <code class="markup--code markup--p-code">4.x</code> version.</p><p name="5609" id="5609" class="graf graf--p graf-after--p">The reason is TiDB 4.x introduces the HTAP architecture, which enables the coexistence of row storage engine and column storage engine. The new column storage engine called TiFlash is independent from the original row storage engine TiKV and will not interfere with each other.</p><p name="06de" id="06de" class="graf graf--p graf-after--p">When the application writes data to TiKV, the data is quickly synchronized to TiFlash through the Raft learner mechanism, so that the row storage and column storage are consistent.</p><p name="dd11" id="dd11" class="graf graf--p graf-after--p">In addition, TiDB uses internal CBO to know whether the query should use the row or column engine as soon as it comes in and automatically routes the query, which greatly reduces the complexity of the application.</p><p name="9c2b" id="9c2b" class="graf graf--p graf-after--p">TiDB 4.x also has a new mechanism that helps improve the performance of the entire data architecture: pessimistic locking. In TiDB 3.x, there was only optimistic locking, which made it easily possible for inter-transaction conflicts under huge data volume of continuous writes.</p><p name="772c" id="772c" class="graf graf--p graf-after--p">Once a transaction conflict occurs, it can only be retried on the client side, which significantly increases the complexity of application development. But pessimistic locking can effectively solve this problem, and the error handling of the application becomes more simple.</p><h3 name="1a00" id="1a00" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="fa02" id="fa02" class="graf graf--p graf-after--h3">Actually, Xiaohongshu has also referred to ClickHouse when making technical selections, and the performance of ClickHouse has some better than TiDB. However, ClickHouse is relatively difficult to operate and maintain.</p><p name="100f" id="100f" class="graf graf--p graf-after--p">In addition, ClickHouse is a column storage engine, in the data update scenario performance is not good. If rewriting “update” to “ append”, it needs a lot of modification cost on one hand and extra de-duplication logic on the other.</p><p name="ea4f" id="ea4f" class="graf graf--p graf-after--p">Therefore, TiDB is the final choice.</p><p name="2181" id="2181" class="graf graf--p graf-after--p">From my point of view, HTAP is the future and can cover various use cases by merging row storage engine and column storage engine. It is cost effective to use only one database to handle various needs with big data.</p><p name="62bf" id="62bf" class="graf graf--p graf-after--p">In the past, in order to support a variety of data products, we had to continuously make technical selections among many databases and carefully consider various use cases, but with HTAP, these complexities no longer exist.</p><p name="9cdb" id="9cdb" class="graf graf--p graf-after--p graf--trailing">Personally, I am looking forward to seeing the gradual simplification of data engineering.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/8d8181d12195"><time class="dt-published" datetime="2023-05-08T01:45:42.645Z">May 8, 2023</time></a>.</p><p><a href="https://medium.com/@lazypro/htap-learning-from-xiaohongshu-8d8181d12195" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

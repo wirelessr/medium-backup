@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>What pattern is considered CQRS?</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">What pattern is considered CQRS?</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Does it matter?
+</section>
+<section data-field="body" class="e-content">
+<section name="c588" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="59f8" id="59f8" class="graf graf--h3 graf--leading graf--title">What pattern is considered CQRS?</h3><h4 name="c41b" id="c41b" class="graf graf--h4 graf-after--h3 graf--subtitle">Does it matter?</h4><figure name="1dd5" id="1dd5" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*AxgedTNPoqnZlpir" data-width="1000" data-height="667" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*AxgedTNPoqnZlpir"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@insungyoon" data-href="https://unsplash.com/@insungyoon" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Insung Yoon</a> on <a href="https://unsplash.com/photos/Uaf6XwW4n10" data-href="https://unsplash.com/photos/Uaf6XwW4n10" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="e16e" id="e16e" class="graf graf--p graf-after--figure">This week, in our study group, there is an interesting question.</p><blockquote name="b8f8" id="b8f8" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">If our service use MongoDB as the primary database and leverage ElasticSearch to benefit searching. Each request is in, our service is responsible for a dual write to update both MongoDB and ElasticSearch. Is this implementation considered CQRS?</em></blockquote><p name="a6b1" id="a6b1" class="graf graf--p graf-after--blockquote">In fact, this implementation is indeed generating a read model for searching and a write model for domain operations. If there is any search request, we can build a search layer or a search service for that.</p><p name="8131" id="8131" class="graf graf--p graf-after--p">This looks like CQRS, doesn’t it?</p><p name="db03" id="db03" class="graf graf--p graf-after--p">In my opinion, such an implementation is not CQRS.</p><p name="649b" id="649b" class="graf graf--p graf-after--p">There are two core concepts about CQRS.</p><ol class="postList"><li name="dc8d" id="dc8d" class="graf graf--li graf-after--p">event sourcing</li><li name="07fa" id="07fa" class="graf graf--li graf-after--li">responsibility segregation</li></ol><p name="e449" id="e449" class="graf graf--p graf-after--li">Let’s see their actual meaning.</p><h3 name="0718" id="0718" class="graf graf--h3 graf-after--p">Event sourcing</h3><p name="5894" id="5894" class="graf graf--p graf-after--h3">Event sourcing is the most important concept for CQRS. When we have a new feature requirement, we can leverage the existed events and replay to generate a new read model so that we don’t need to modify the original code base.</p><p name="7b15" id="7b15" class="graf graf--p graf-after--p">In other words, we can easily fulfill any query requirement without impact the production functionality.</p><p name="c1f0" id="c1f0" class="graf graf--p graf-after--p">Let’s go back to the original example.</p><p name="6a6d" id="6a6d" class="graf graf--p graf-after--p">If our service keeps every input event in MongoDB so that new read models can be generated in the future, then I would say it’s “very much like” CQRS.</p><h3 name="7640" id="7640" class="graf graf--h3 graf-after--p">Responsibility segregation</h3><p name="e1b7" id="e1b7" class="graf graf--p graf-after--h3">The another key point is the responsibility segregation, i.e., the last two letters of CQRS.</p><p name="d02e" id="d02e" class="graf graf--p graf-after--p">What does that mean?</p><p name="90ec" id="90ec" class="graf graf--p graf-after--p">From my point of view, responsibility for building the read and write models must be separated.</p><p name="ddde" id="ddde" class="graf graf--p graf-after--p">If our service is responsible for both update MongoDB and update ElasticSearch, that doesn’t sound separate at all.</p><p name="0f53" id="0f53" class="graf graf--p graf-after--p">In order to release the burden of updating many models, CQRS introduces an event synchronization mechanism for event consumers to generate read models and make them consistent eventually.</p><p name="4de2" id="4de2" class="graf graf--p graf-after--p">Let’s continue with the original example.</p><p name="2dfe" id="2dfe" class="graf graf--p graf-after--p">If our service maintain the MongoDB’s domain states and keep every domain operation as audit logs. Then, we can build a worker who regularly digest these logs and update ElasticSearch. So, this is a CQRS definitely.</p><h3 name="61b5" id="61b5" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="c590" id="c590" class="graf graf--p graf-after--h3">Why do we need to clarify these terminology details? Is it important to know if it is considered CQRS?</p><p name="c682" id="c682" class="graf graf--p graf-after--p">Well, it depends.</p><p name="3dd3" id="3dd3" class="graf graf--p graf-after--p">If we want to make the original system better, then we need to know exactly what a paradigm means. If we hastily assume that the original system is already a paradigm, then we miss the opportunity to look at it deeply.</p><p name="e44a" id="e44a" class="graf graf--p graf-after--p">The original implementation actually works well at the moment. However, if the input request increases, updating ElasticSearch will become a bottleneck while handling domain operations. At that time, we then have to make additional improvements.</p><p name="f6a5" id="f6a5" class="graf graf--p graf-after--p graf--trailing">Those paradigms are the indexes that provide how to improve. Because of this, we need to understand the specifics of the paradigms.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/6de7ccb13047"><time class="dt-published" datetime="2022-11-07T00:33:17.765Z">November 7, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/what-pattern-is-considered-cqrs-6de7ccb13047" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

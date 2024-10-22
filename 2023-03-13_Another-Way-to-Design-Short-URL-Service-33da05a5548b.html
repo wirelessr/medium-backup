@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Another Way to Design Short URL Service</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Another Way to Design Short URL Service</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+An out-of-the-box feature in AWS
+</section>
+<section data-field="body" class="e-content">
+<section name="a9ab" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="d431" id="d431" class="graf graf--h3 graf--leading graf--title">Another Way to Design Short URL Service</h3><h4 name="f84f" id="f84f" class="graf graf--h4 graf-after--h3 graf--subtitle">An out-of-the-box feature in AWS</h4><figure name="d330" id="d330" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*XvJf9qS_o-g26Qit.png" data-width="1742" data-height="1161" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*XvJf9qS_o-g26Qit.png"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@pete_nuij" data-href="https://unsplash.com/@pete_nuij" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Pete Nuij</a> on <a href="https://unsplash.com/photos/5iorVP5od7Y" data-href="https://unsplash.com/photos/5iorVP5od7Y" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="37df" id="37df" class="graf graf--p graf-after--figure">Short URL service is a common feature, not only does it look better with shorter URLs, but it also has many additional benefits. For example, when a commercial website is sending out promotion SMS, shortening the URL can effectively save the cost of SMS.</p><p name="bde8" id="bde8" class="graf graf--p graf-after--p">In addition, short URL services involve many important concepts of system design and are a common question during technical interviews. To design the architecture of a short URL service, we usually start with the following diagram and discuss some considerations.</p><figure name="aade" id="aade" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*A7xidgJfl3X5g1R9COpX0g.png" data-width="662" data-height="156" src="https://cdn-images-1.medium.com/max/800/1*A7xidgJfl3X5g1R9COpX0g.png"></figure><h3 name="c9e9" id="c9e9" class="graf graf--h3 graf-after--figure">General Rules</h3><ul class="postList"><li name="70cd" id="70cd" class="graf graf--li graf-after--h3">Generation rate: Knowing the rate at the client side to generate short URLs allows us to evaluate what kind of database is needed. In addition, the generation rate also affects whether ACID, i.e. <code class="markup--code markup--li-code">InsertIfNotExisted</code>, is required.</li><li name="4d62" id="4d62" class="graf graf--li graf-after--li">Read frequency: If it is a system with a large number of reads, we will always need to consider caching.</li><li name="c7a7" id="c7a7" class="graf graf--li graf-after--li">Retention period: How long to keep the generated short URLs and the generation rate can be multiplied to know the collision probability of the algorithm and whether the database needs to be sharded.</li><li name="0e4e" id="0e4e" class="graf graf--li graf-after--li">Additional features: The need to provide additional features also directly affects the system design, e.g., if we want to track usage, how to update the counters in the case of caching.</li></ul><p name="3dc6" id="3dc6" class="graf graf--p graf-after--li">The above is a list of functional requirements, but of course, there are also non-functional requirements.</p><ul class="postList"><li name="773a" id="773a" class="graf graf--li graf-after--p">Availability: How long does the short URL service allow for downtime, which will determine whether a load balancer needs to be used and whether the database needs to be clustered.</li><li name="ab26" id="ab26" class="graf graf--li graf-after--li">Scalability: When the usage increases, not only the service itself must be able to scale horizontally, but also the bottleneck of the database must be addressed.</li><li name="07de" id="07de" class="graf graf--li graf-after--li">Consistency: What should be done when two concurrently generated short addresses are the same?</li></ul><p name="95b6" id="95b6" class="graf graf--p graf-after--li">In the end, in order to achieve a scalable and highly availability short URL service, the architecture diagram usually becomes as follows.</p><figure name="fdd3" id="fdd3" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*7rIFXELCP87GnzE3pM68pg.png" data-width="924" data-height="948" src="https://cdn-images-1.medium.com/max/800/1*7rIFXELCP87GnzE3pM68pg.png"></figure><p name="0bc9" id="0bc9" class="graf graf--p graf-after--figure">Well, it’s a bit complicated, but it’s actually putting in all the factors mentioned before.</p><p name="4213" id="4213" class="graf graf--p graf-after--p">In order to provide scalability, there is a load balancer to spread the traffic to many API services, and each API generates its own short URL and writes to the corresponding database cluster based on sharding rules. When reading, in order to reduce the database load, we first read from the cache, and then read from the database if it does not exist.</p><p name="278f" id="278f" class="graf graf--p graf-after--p">In addition, we have to consider whether the database is SQL or NoSQL, and if it is SQL, we have to design our own sharding mechanism. If it is NoSQL, how to implement ACID. Oh, we haven’t mentioned the monitoring, the monitoring of API, the monitoring of each database shard, and so on and so forth.</p><p name="76c6" id="76c6" class="graf graf--p graf-after--p">As for the hashing algorithm, that is not the focus of this article. After all, the system architecture alone is troublesome enough.</p><h3 name="6636" id="6636" class="graf graf--h3 graf-after--p">Another Way</h3><p name="94bb" id="94bb" class="graf graf--p graf-after--h3">In fact, there is a simpler way to achieve a highly scalable and available short URL service.</p><p name="fbaa" id="fbaa" class="graf graf--p graf-after--p">Using AWS S3 with AWS Cloudfront, there is a step-by-step tutorial in the following article.</p><div name="a8df" id="a8df" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://www.intricatecloud.io/2019/09/create-your-own-short-link-redirects-using-cloudfront-s3/" data-href="https://www.intricatecloud.io/2019/09/create-your-own-short-link-redirects-using-cloudfront-s3/" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://www.intricatecloud.io/2019/09/create-your-own-short-link-redirects-using-cloudfront-s3/"><strong class="markup--strong markup--mixtapeEmbed-strong">Create your own short link redirects using CloudFront + S3 - intricate cloud</strong><br><em class="markup--em markup--mixtapeEmbed-em">Get branded short links under your own domain for dirt-cheap by self-hosting it on AWS using CloudFront + S3. It&#39;s a…</em>www.intricatecloud.io</a><a href="https://www.intricatecloud.io/2019/09/create-your-own-short-link-redirects-using-cloudfront-s3/" class="js-mixtapeImage mixtapeImage u-ignoreBlock" data-media-id="686be6cd9c79fd41dade08112dc83aa3" data-thumbnail-img-id="0*juGNaE1j5G7AXV3L" style="background-image: url(https://cdn-images-1.medium.com/fit/c/160/160/0*juGNaE1j5G7AXV3L);"></a></div><p name="cc7b" id="cc7b" class="graf graf--p graf-after--mixtapeEmbed">Briefly, the S3 object setting <code class="markup--code markup--p-code">x-amz-website-redirect-location</code> can automatically convert the read object to <strong class="markup--strong markup--p-strong">HTTP 301 Redirect</strong>, and then with the built-in integration of AWS Cloudfront and S3, we can do the caching.</p><p name="92a7" id="92a7" class="graf graf--p graf-after--p">The whole architecture will become very simple.</p><figure name="d681" id="d681" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*5XPFTDviOPLgnb6GNP2_AA.png" data-width="1056" data-height="302" src="https://cdn-images-1.medium.com/max/800/1*5XPFTDviOPLgnb6GNP2_AA.png"></figure><p name="0ef0" id="0ef0" class="graf graf--p graf-after--figure">Because S3 itself is highly available and scalable, and can be treated as unlimited volume, our problem becomes very simple, we just need to manage the creation of the short URL itself.</p><p name="9650" id="9650" class="graf graf--p graf-after--p">Furthermore, both S3 and Cloudfront are monitored by AWS Cloudwatch, so it saves a lot of maintenance effort.</p><p name="20ba" id="20ba" class="graf graf--p graf-after--p">If we want to know the performance of short URLs, we just need to enable Cloudfront’s access log and analyze it with AWS Athena. <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html" data-href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">The official AWS documentation</a> will have enough information.</p><p name="62be" id="62be" class="graf graf--p graf-after--p">One more point to note is that <a href="https://repost.aws/knowledge-center/s3-503-within-request-rate-prefix" data-href="https://repost.aws/knowledge-center/s3-503-within-request-rate-prefix" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">AWS S3 has a built-in rate limit</a>. If short URLs are generated and written directly to the root directory, then the entire service is limited to 3500 short URLs per second.</p><p name="a078" id="a078" class="graf graf--p graf-after--p">However, this can be avoided by a little trick. The rate limit rule is based on the object prefix, so we just need to add slash appropriately after generating short URLs. For example, if the generated short URL is 10 characters, <code class="markup--code markup--p-code">abcdefghij</code>, then the mid slash can effectively avoid the rate limit by turning it into <code class="markup--code markup--p-code">abcde/fghij</code>.</p><p name="3f02" id="3f02" class="graf graf--p graf-after--p">Another problem is that AWS S3 itself does not have ACID, so when two objects with the same path but different metadata will occur the latter override the former. To avoid this problem is not difficult, we need only to add additional characters into the short URL, e.g. the last few digits of epoch.</p><p name="b2d8" id="b2d8" class="graf graf--p graf-after--p">Consider the ten-character short URL <code class="markup--code markup--p-code">abcdefghij</code> with the rate limit problem can become <code class="markup--code markup--p-code">12/abcdefghij</code>.</p><p name="7b84" id="7b84" class="graf graf--p graf-after--p">This depends on creativity, there is no fixed answer.</p><h3 name="476f" id="476f" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="080c" id="080c" class="graf graf--p graf-after--h3">Short URL service is a good topic to learn system design, although the function is simple, but can cover most of the system design issues.</p><p name="7bee" id="7bee" class="graf graf--p graf-after--p">But if we really want to implement a short URL service on our own, then those interesting topics will soon become nightmares. Therefore, I prefer to use some existing solutions, such as AWS S3, rather than building a complete system from scratch.</p><p name="dcdd" id="dcdd" class="graf graf--p graf-after--p">However, even with an existing solution, those system design issues must be carefully evaluated, such as rate limit and ACID.</p><p name="cfbb" id="cfbb" class="graf graf--p graf-after--p graf--trailing">System design is interesting, especially when there are many alternatives, and the process of weighing the pros and cons is always engaging.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/33da05a5548b"><time class="dt-published" datetime="2023-03-13T01:48:14.898Z">March 13, 2023</time></a>.</p><p><a href="https://medium.com/@lazypro/another-way-to-design-short-url-service-33da05a5548b" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

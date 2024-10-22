@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Building a SNOWPLOW Playground</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Building a SNOWPLOW Playground</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+An Open Source, Flexible and Powerful Event Tracking System
+</section>
+<section data-field="body" class="e-content">
+<section name="b874" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="57d0" id="57d0" class="graf graf--h3 graf--leading graf--title">Building a SNOWPLOW Playground</h3><h4 name="d4bf" id="d4bf" class="graf graf--h4 graf-after--h3 graf--subtitle">An Open Source, Flexible and Powerful Event Tracking System</h4><figure name="a739" id="a739" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*3xQloKg6O6bAExg5" data-width="1000" data-height="648" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*3xQloKg6O6bAExg5"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@eliasnull" data-href="https://unsplash.com/@eliasnull" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Elias Null</a> on <a href="https://unsplash.com/photos/YIU-2bifvis" data-href="https://unsplash.com/photos/YIU-2bifvis" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="a41e" id="a41e" class="graf graf--p graf-after--figure"><a href="https://snowplow.io/" data-href="https://snowplow.io/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">SNOWPLOW</a> is a platform for tracking events, i.e. collecting various user behavior events and analyzing them. Nowadays, there are many famous similar products like Google Analytics, <a href="https://mixpanel.com/" data-href="https://mixpanel.com/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Mixpanel</a>, etc., but in the open source ecosystem, SNOWPLOW has a place.</p><p name="a16a" id="a16a" class="graf graf--p graf-after--p">Although there is a paid version of SNOWPLOW, I can’t figure out any reason not to use Mixpanel instead of SNOWPLOW since I have to pay for it, but there are a lot of advantages I can put forward for the open source version of SNOWPLOW.</p><p name="2336" id="2336" class="graf graf--p graf-after--p">For example, the architecture is simple and easy to integrate with existing infrastructure, and there are many flexible components that can be customized. Most importantly, there are a lot of SDKs available for various scenarios, e.g., Web, Mobile apps and even backend systems.</p><p name="a233" id="a233" class="graf graf--p graf-after--p">This article will not introduce the use case of SNOWPLOW, because it has been introduced in detail in the <a href="https://docs.snowplow.io/docs/recipes/" data-href="https://docs.snowplow.io/docs/recipes/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">official document</a>. Instead, this article will introduce the architecture of SNOWPLOW and provide a <strong class="markup--strong markup--p-strong"><em class="markup--em markup--p-em">free</em></strong> playground.</p><blockquote name="f780" id="f780" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">Why emphasize on free?</em></blockquote><p name="eee8" id="eee8" class="graf graf--p graf-after--blockquote">In fact, in the official SNOWPLOW document there is a <a href="https://docs.snowplow.io/docs/getting-started-on-snowplow-open-source/what-is-quick-start/" data-href="https://docs.snowplow.io/docs/getting-started-on-snowplow-open-source/what-is-quick-start/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">quick start environment</a> for the terraform, but it is deployed on AWS or GCP and uses a lot of paid services. For a beta player, maybe we just want to experience what it can do, but don’t want to pay for it, at least I don’t, then a local free test environment is necessary.</p><h3 name="a0c9" id="a0c9" class="graf graf--h3 graf-after--p">Architecture Overview</h3><p name="4d78" id="4d78" class="graf graf--p graf-after--h3">First of all, let’s take a quick look at the SNOWPLOW architecture.</p><figure name="4abb" id="4abb" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*QwVjSkCE7PS4Dg1A.png" data-width="1317" data-height="592" src="https://cdn-images-1.medium.com/max/800/0*QwVjSkCE7PS4Dg1A.png"><figcaption class="imageCaption"><a href="https://docs.snowplow.io/docs/understanding-your-pipeline/architecture-overview/" data-href="https://docs.snowplow.io/docs/understanding-your-pipeline/architecture-overview/" class="markup--anchor markup--figure-anchor" rel="nofollow noopener" target="_blank">https://docs.snowplow.io/docs/understanding-your-pipeline/architecture-overview/</a></figcaption></figure><p name="386a" id="386a" class="graf graf--p graf-after--figure">There are three core components in the whole infrastructure, <strong class="markup--strong markup--p-strong">collector</strong>, <strong class="markup--strong markup--p-strong">enricher</strong> and <strong class="markup--strong markup--p-strong">schema registry</strong>, which are the fundamentals of SNOWPLOW. As for what kind of data warehouse or analysis engine to use, those can be freely matched and are not part of the SNOWPLOW package.</p><ul class="postList"><li name="cb36" id="cb36" class="graf graf--li graf-after--p">Collector: Collects events from the SDK, these events are raw data and therefore continue to be delivered to the enricher.</li><li name="de0a" id="de0a" class="graf graf--li graf-after--li">Schema Registry: The registry used in SNOWPLOW is a self-developed <strong class="markup--strong markup--li-strong">iglu</strong>, which is a service that manages JSON schema.</li><li name="f8cd" id="f8cd" class="graf graf--li graf-after--li">Enricher: After receiving the raw data, the first step is to validate it with the schema registered in the schema registry, and if it passes the validation, then it will be processed to produce a more analytical format and continue to send it to the next stage. As for the data to be sent to the data warehouse or Looker or other analysis platforms is based on demand.</li></ul><p name="9cd3" id="9cd3" class="graf graf--p graf-after--li">One of the more interesting parts of the process is the enrichment stage, where <a href="https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/" data-href="https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">here</a> lists all the available plugins. Let’s take a practical example. An incoming event will only have an IP field, but subsequent analysis will depend on the geographic location, which can be enriched by the plugin <a href="https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/ip-lookup-enrichment/" data-href="https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/ip-lookup-enrichment/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">IP Lookup</a>.</p><p name="a1d5" id="a1d5" class="graf graf--p graf-after--p">This is a simple but powerful architecture that includes both validation and enrichment, and what’s more, the events are flexible in their format and can be customized to fit every need. In addition, these events can be downstreamed in a variety of ways based on demand, and can be flexibly integrated with the existing infrastructure.</p><h3 name="6809" id="6809" class="graf graf--h3 graf-after--p">Playground</h3><blockquote name="ae8a" id="ae8a" class="graf graf--blockquote graf-after--h3"><a href="https://github.com/wirelessr/snowplow-pipeline" data-href="https://github.com/wirelessr/snowplow-pipeline" class="markup--anchor markup--blockquote-anchor" rel="noopener" target="_blank">https://github.com/wirelessr/snowplow-pipeline</a></blockquote><p name="0c41" id="0c41" class="graf graf--p graf-after--blockquote">This Github repository provides a <code class="markup--code markup--p-code">docker-compose.yml</code>, yes, we all love <code class="markup--code markup--p-code">docker-compose</code>. All the required components can be built locally and the usage is written in the <code class="markup--code markup--p-code">README</code> which should not cause any problems.</p><p name="ed05" id="ed05" class="graf graf--p graf-after--p">Also, for testing purposes, in addition to viewing the local database, I’ve put an additional <em class="markup--em markup--p-em">Kafka</em> management console at <code class="markup--code markup--p-code">localhost:9021</code>, which makes it possible to visually see each event.</p><p name="a262" id="a262" class="graf graf--p graf-after--p">All the settings of the components to be modified are located in the <code class="markup--code markup--p-code">config.hocon</code> under the corresponding folder.</p><p name="5836" id="5836" class="graf graf--p graf-after--p">Let’s describe the architecture of the test environment as follows.</p><figure name="1bd3" id="1bd3" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*KEkGHyNGnrFmO-z3IEW4qQ.png" data-width="1148" data-height="224" src="https://cdn-images-1.medium.com/max/800/1*KEkGHyNGnrFmO-z3IEW4qQ.png"></figure><ol class="postList"><li name="47ca" id="47ca" class="graf graf--li graf-after--figure">There is a mock web with Javascript SDK installed, after entering <code class="markup--code markup--li-code">http://localhost</code> it will send some events to the collector periodically.</li><li name="6c94" id="6c94" class="graf graf--li graf-after--li">When the collector receives an event, it will store it in the database (atomic.events) and send it to Kafka.</li><li name="1dc0" id="1dc0" class="graf graf--li graf-after--li">When the Enricher receives an event, it first confirms the schema with the Iglu server, then performs basic enrichment and sends it to Kafka.</li><li name="7460" id="7460" class="graf graf--li graf-after--li">The final mock processor is to simulate how the enriched event should be handled.</li></ol><p name="6a2b" id="6a2b" class="graf graf--p graf-after--li">The whole process is straightforward. After setting up the environment, we can observe the complete data flow in Kafka’s management console.</p><h3 name="3a2e" id="3a2e" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="2666" id="2666" class="graf graf--p graf-after--h3">In fact, I have tried SNOWPLOW’s cloud-based Enterprise version, and the biggest difference I felt was the schema management. In the the open-source version, if we want to customize the event fields, we have to integrate Iglu’s REST API, and then we have to understand Iglu’s design concepts. However, in the cloud version, there is an easy-to-use UI that makes managing schema much easier.</p><p name="2f44" id="2f44" class="graf graf--p graf-after--p graf--trailing">Nevertheless, if we just want to do basic event tracking, I believe the open-source version of SNOWPLOW provides a good capability. Of course, if we want to use it more deeply, we need to understand and integrate it more comprehensively, which is also the price to pay for open source software.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/90d90ff69393"><time class="dt-published" datetime="2023-07-24T01:47:34.822Z">July 24, 2023</time></a>.</p><p><a href="https://medium.com/@lazypro/building-a-snowplow-playground-90d90ff69393" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

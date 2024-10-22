@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Balancing Timeliness and Accuracy in Software Architecture</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Balancing Timeliness and Accuracy in Software Architecture</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Navigating event-driven architecture for real-time updates
+</section>
+<section data-field="body" class="e-content">
+<section name="c37d" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="bd91" id="bd91" class="graf graf--h3 graf--leading graf--title">Balancing Timeliness and Accuracy in Software Architecture</h3><h4 name="4e77" id="4e77" class="graf graf--h4 graf-after--h3 graf--subtitle">Navigating event-driven architecture for real-time updates</h4><figure name="7394" id="7394" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*tdmJ7ZAWBcuS27hB" data-width="1000" data-height="563" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*tdmJ7ZAWBcuS27hB"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@javaistan" data-href="https://unsplash.com/@javaistan" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Afif Ramdhasuma</a> on <a href="https://unsplash.com/photos/green-and-silver-screw-driver-QWPSxi5RkcI" data-href="https://unsplash.com/photos/green-and-silver-screw-driver-QWPSxi5RkcI" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="fa8b" id="fa8b" class="graf graf--p graf-after--figure">Recently our engineer asked me a question.</p><blockquote name="b86b" id="b86b" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">Why do we need to periodically get the latest state via API while we design the event-driven architecture, in addition to relying on asynchronous events for data synchronization?</em></blockquote><blockquote name="fdc2" id="fdc2" class="graf graf--blockquote graf-after--blockquote"><em class="markup--em markup--blockquote-em">If we need to get the latest status periodically, then why not just synchronize the data through the API completely?</em></blockquote><p name="4b76" id="4b76" class="graf graf--p graf-after--blockquote">This is a good question, but before answering this question, let’s consider what our system requirements are.</p><p name="05eb" id="05eb" class="graf graf--p graf-after--p">Suppose we want our clients to see the latest status as much as possible, and we can only allow a maximum delay of 5 minutes.</p><p name="6ae6" id="6ae6" class="graf graf--p graf-after--p">How would we design the system to synchronize the status through events? First, we would trigger a corresponding event at the point of addition, modification, or deletion of the original data, and then synchronize the state of the original data to our system based on the event. This design ensures clients can see the latest status.</p><p name="0648" id="0648" class="graf graf--p graf-after--p">On the other hand, if we need to synchronize the raw data via the API, then we must start a periodic task, such as a crontab, every five minutes, and then periodically download all the raw data back via the API.</p><p name="d00e" id="d00e" class="graf graf--p graf-after--p">Both approaches meet our system needs, but the former is much lighter than the latter, until a problem occurs.</p><h3 name="2617" id="2617" class="graf graf--h3 graf-after--p">Problems of Asynchronization</h3><p name="40bd" id="40bd" class="graf graf--p graf-after--h3">The biggest problem with asynchronous events is we cannot ensure the order of the events (unless we add ordering identifiers to the event design). So it is possible that two close updates arrive in the opposite order, resulting in inconsistent data.</p><p name="5de4" id="5de4" class="graf graf--p graf-after--p">For example, the original data is <code class="markup--code markup--p-code">value = A</code>. In a short period of time, it is changed to B and then to C. However, if the order of arrival of the events is such that C arrives before B, then the client will see the result as <code class="markup--code markup--p-code">value = B</code> (instead of <code class="markup--code markup--p-code">value = C</code>).</p><p name="47a2" id="47a2" class="graf graf--p graf-after--p">In addition, asynchronous communication without a proper handshake process can result in event loss, which again can produce inconsistent data.</p><p name="d9c8" id="d9c8" class="graf graf--p graf-after--p">For these reasons, we often include additional mitigation via the periodic checking mentioned at the beginning. This leads to the question at the beginning, why don’t we just synchronize everything through the API?</p><p name="924e" id="924e" class="graf graf--p graf-after--p">The answer is simple, because we are comparing two completely different requirements, i.e., timeliness and accuracy.</p><p name="bb3d" id="bb3d" class="graf graf--p graf-after--p">Timeliness and accuracy are the two ends of the spectrum.</p><figure name="5210" id="5210" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*1yHfvjNDftwFadqAzukk9A.png" data-width="578" data-height="106" src="https://cdn-images-1.medium.com/max/800/1*1yHfvjNDftwFadqAzukk9A.png"></figure><p name="7e69" id="7e69" class="graf graf--p graf-after--figure">Under the fixed cost premise, we can’t ask a system to be both real-time and accurate, there must be a trade-off. Costs here include many items, such as development and maintenance costs, hardware costs, transfer costs, and so on.</p><p name="28b9" id="28b9" class="graf graf--p graf-after--p">When we want to achieve high timeliness, we sacrifice accuracy. But if we want to maintain a certain level of accuracy, then we move a little bit to the other end of the spectrum, i.e., periodic checking.</p><p name="d3c3" id="d3c3" class="graf graf--p graf-after--p">This is why in a distributed architecture it is better to have a BASE rather than an ACID. The E of BASE is eventual consistency, we make sure that the data will be consistent in the end, but how fast is that end? It depends on how many compromises we have to make.</p><h3 name="82e7" id="82e7" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="0919" id="0919" class="graf graf--p graf-after--h3">In a software architecture, similar trade-offs occur in various scenarios.</p><p name="c7e8" id="c7e8" class="graf graf--p graf-after--p">In this case, we end up choosing timeliness over accuracy, but there may be specific scenarios where we need accuracy over timeliness, e.g., a financial reporting system.</p><p name="7774" id="7774" class="graf graf--p graf-after--p">In this case, there are two common design patterns for financial reporting systems.</p><ul class="postList"><li name="f379" id="f379" class="graf graf--li graf-after--p">Monthly report dashboard</li><li name="1e49" id="1e49" class="graf graf--li graf-after--li">Takes a while to output reports</li></ul><p name="e525" id="e525" class="graf graf--p graf-after--li">In the first pattern, we sacrifice granularity for report presentation efficiency. On the other hand, in the latter pattern we choose to utilize additional computation time in order to achieve report accuracy. These design patterns are the result of trade-offs.</p><p name="8308" id="8308" class="graf graf--p graf-after--p graf--trailing">There is no one-size-fits-all solution that can be applied to all scenarios, so we need to be careful to identify the non-functional requirements behind the functional requirements when designing the architecture in order to get things right.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/35d097b634cd"><time class="dt-published" datetime="2024-05-06T02:01:09.256Z">May 6, 2024</time></a>.</p><p><a href="https://medium.com/@lazypro/balancing-timeliness-and-accuracy-in-software-architecture-35d097b634cd" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

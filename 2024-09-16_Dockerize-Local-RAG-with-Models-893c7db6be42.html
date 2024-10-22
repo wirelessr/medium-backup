@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Dockerize Local RAG with Models</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Dockerize Local RAG with Models</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Containerize with Ollama, BGE-M3, and MultiBERT for a complete local RAG system
+</section>
+<section data-field="body" class="e-content">
+<section name="e4cb" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="82e2" id="82e2" class="graf graf--h3 graf--leading graf--title">Dockerize Local RAG with Models</h3><h4 name="3566" id="3566" class="graf graf--h4 graf-after--h3 graf--subtitle">Containerize with Ollama, BGE-M3, and MultiBERT for a complete local RAG system</h4><figure name="5d9c" id="5d9c" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="1*uydgLGKA2zKqehQDzLElkw.png" data-width="2314" data-height="1458" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*uydgLGKA2zKqehQDzLElkw.png"><figcaption class="imageCaption">My girl</figcaption></figure><p name="2c4e" id="2c4e" class="graf graf--p graf-after--figure">Previously, I introduced <a href="https://medium.com/@lazypro/做一個務實的rag-pragmatic-rag-65fc63647c51" data-href="https://medium.com/@lazypro/做一個務實的rag-pragmatic-rag-65fc63647c51" class="markup--anchor markup--p-anchor" target="_blank">a generic RAG template</a>, in which I mentioned that there are three cores needed to make a high-quality RAG.</p><ol class="postList"><li name="3dd0" id="3dd0" class="graf graf--li graf-after--p">embedding with semantic understanding</li><li name="27cb" id="27cb" class="graf graf--li graf-after--li">LLM with contextualized knowledge.</li><li name="cbc2" id="cbc2" class="graf graf--li graf-after--li">compression result by rerank.</li></ol><p name="fb4b" id="fb4b" class="graf graf--p graf-after--li">When all of these are in place, a high quality RAG will be created, regardless of whether there is fine-tuning or not.</p><p name="1a7a" id="1a7a" class="graf graf--p graf-after--p">Add high quality sources and accurate prompts, and you’ve got a complete RAG.</p><p name="7e20" id="7e20" class="graf graf--p graf-after--p">Simple, right?</p><p name="27af" id="27af" class="graf graf--p graf-after--p">Is it possible to containerize such a simple yet useful implementation and run it completely locally? Yes, of course.</p><p name="d859" id="d859" class="graf graf--p graf-after--p">Let’s take the three models mentioned in the previous template as an example.</p><ol class="postList"><li name="1ee0" id="1ee0" class="graf graf--li graf-after--p"><code class="markup--code markup--li-code">Ollama</code> plus <code class="markup--code markup--li-code">TAIDE</code>.</li><li name="97f6" id="97f6" class="graf graf--li graf-after--li"><code class="markup--code markup--li-code">BGE-M3</code> for embedding.</li><li name="8dcc" id="8dcc" class="graf graf--li graf-after--li"><code class="markup--code markup--li-code">ms-marco-MultiBERT-L-12</code> as reranker</li></ol><h3 name="df33" id="df33" class="graf graf--h3 graf-after--li">Ollama with Models</h3><p name="81b8" id="81b8" class="graf graf--p graf-after--h3">Ollama is a completely local LLM framework, you can pull down the LLM model you want to use by <code class="markup--code markup--p-code">ollama pull</code>.</p><p name="10fe" id="10fe" class="graf graf--p graf-after--p">Ollama itself provides a basic container.</p><p name="4c42" id="4c42" class="graf graf--p graf-after--p"><code class="markup--code markup--p-code">docker pull ollama/ollama</code>.</p><p name="f74e" id="f74e" class="graf graf--p graf-after--p">Nevertheless, there is no simple way to get this container to mount the model. So here’s a little bit hack, let me demonstrate with a <code class="markup--code markup--p-code">Dockerfile</code>.</p><pre data-code-block-mode="1" spellcheck="false" data-code-block-lang="bash" name="9a36" id="9a36" class="graf graf--pre graf-after--p graf--preV2"><span class="pre--content">FROM ollama/ollama as taide_base<br /><br />RUN <span class="hljs-built_in">nohup</span> bash -c <span class="hljs-string">&quot;ollama serve &amp;&quot;</span> &amp;&amp; <span class="hljs-built_in">sleep</span> 5 &amp;&amp; ollama pull cwchang/llama3-taide-lx-8b-chat-alpha1</span></pre><p name="02bc" id="02bc" class="graf graf--p graf-after--pre">We use Ollama’s container directly and wake up the ollama service during the <code class="markup--code markup--p-code">docker build</code> process and download the model directly.</p><p name="bb2a" id="bb2a" class="graf graf--p graf-after--p">This way we have an LLM framework with models.</p><h3 name="eb63" id="eb63" class="graf graf--h3 graf-after--p">Packaging <code class="markup--code markup--h3-code">BGE-M3</code></h3><p name="66d2" id="66d2" class="graf graf--p graf-after--h3">The <code class="markup--code markup--p-code">BGE-M3</code> here is a HuggingFace supplied model, so all we need to do is find the HuggingFace model catalog and copy it into the container.</p><p name="eae6" id="eae6" class="graf graf--p graf-after--p">In my environment (without modifying any settings), the model directory is at</p><blockquote name="eb26" id="eb26" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">~/.cache/huggingface/hub/models--BAAI-bge-m3</em></blockquote><p name="57d0" id="57d0" class="graf graf--p graf-after--blockquote">Therefore, we only need to <code class="markup--code markup--p-code">COPY</code> the contents of this directory into the container.</p><p name="818f" id="818f" class="graf graf--p graf-after--p">However, it is important to note that HuggingFace requires <code class="markup--code markup--p-code">config.json</code> when loading models, and this file is very deep.</p><pre data-code-block-mode="1" spellcheck="false" data-code-block-lang="python" name="8a17" id="8a17" class="graf graf--pre graf-after--p graf--preV2"><span class="pre--content"><span class="hljs-keyword">def</span> <span class="hljs-title function_">init_embeddings</span>():<br />    <span class="hljs-keyword">from</span> langchain_huggingface <span class="hljs-keyword">import</span> HuggingFaceEmbeddings<br />    HF_EMBEDDING_MODEL = <span class="hljs-string">&#x27;./models--BAAI--bge-m3/snapshots/5617a9f61b028005a4858fdac845db406aefb181&#x27;</span><br /><br />    <span class="hljs-keyword">return</span> HuggingFaceEmbeddings(<br />        model_name=HF_EMBEDDING_MODEL,<br />        model_kwargs={<span class="hljs-string">&#x27;device&#x27;</span>: <span class="hljs-string">&#x27;cpu&#x27;</span>},<br />        encode_kwargs={<span class="hljs-string">&#x27;normalize_embeddings&#x27;</span>: <span class="hljs-literal">False</span>}<br />    )</span></pre><p name="a65c" id="a65c" class="graf graf--p graf-after--pre">As we can see from this code, we actually need to specify the snapshot that is used at the moment when using the model.</p><p name="14de" id="14de" class="graf graf--p graf-after--p">Well, we are left with the last one, reranker.</p><h3 name="93ce" id="93ce" class="graf graf--h3 graf-after--p">Packaging <code class="markup--code markup--h3-code">ms-marco-MultiBERT-L-12</code></h3><p name="9bd5" id="9bd5" class="graf graf--p graf-after--h3">The <code class="markup--code markup--p-code">ms-marco-MultiBERT-L-12</code> used here is integrated by langchain. With the default behavior, langchain&#39;s <code class="markup--code markup--p-code">document_compressors</code> will place the model in <code class="markup--code markup--p-code">/tmp</code>.</p><p name="fea4" id="fea4" class="graf graf--p graf-after--p">In other words, when we run the following code, it downloads the model into <code class="markup--code markup--p-code">/tmp</code>.</p><pre data-code-block-mode="2" spellcheck="false" data-code-block-lang="python" name="fc7c" id="fc7c" class="graf graf--pre graf-after--p graf--preV2"><span class="pre--content"><span class="hljs-keyword">from</span> langchain.retrievers.document_compressors <span class="hljs-keyword">import</span> FlashrankRerank<br />compressor = FlashrankRerank(model_name=<span class="hljs-string">&#x27;ms-marco-MultiBERT-L-12&#x27;</span>, top_n=<span class="hljs-number">5</span>)</span></pre><p name="485b" id="485b" class="graf graf--p graf-after--pre">So what we need to do is copy <code class="markup--code markup--p-code">/tmp/ms-marco-MultiBERT-L-12</code> into the container.</p><p name="7b1f" id="7b1f" class="graf graf--p graf-after--p">But that’s not enough, we need to explicitly specify on the client side that the model’s directory has been changed to the container’s current directory. This is a bit complicated to explain, so let’s just look at an example.</p><pre data-code-block-mode="1" spellcheck="false" data-code-block-lang="javascript" name="d0a8" id="d0a8" class="graf graf--pre graf-after--p graf--preV2"><span class="pre--content"><span class="hljs-keyword">from</span> flashrank <span class="hljs-keyword">import</span> <span class="hljs-title class_">Ranker</span><br /><span class="hljs-keyword">from</span> langchain.<span class="hljs-property">retrievers</span>.<span class="hljs-property">document_compressors</span> <span class="hljs-keyword">import</span> <span class="hljs-title class_">FlashrankRerank</span><br /><br />ranker = <span class="hljs-title class_">Ranker</span>(model_name=<span class="hljs-string">&#x27;ms-marco-MultiBERT-L-12&#x27;</span>, cache_dir=<span class="hljs-string">&#x27;.&#x27;</span>)<br />compressor = <span class="hljs-title class_">FlashrankRerank</span>(client=ranker, top_n=<span class="hljs-number">5</span>)</span></pre><p name="296a" id="296a" class="graf graf--p graf-after--pre">All right, we’ve got the three models we need in the container.</p><h3 name="ffc5" id="ffc5" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="52db" id="52db" class="graf graf--p graf-after--h3">Although this article provides a containerized RAG solution, I have to say that the container image is 18 GB.</p><p name="9221" id="9221" class="graf graf--p graf-after--p">If we were to package it with the embedded vectors from the source, it would easily exceed 20 GB.</p><p name="5652" id="5652" class="graf graf--p graf-after--p graf--trailing">Therefore, this container can only be used for simple testing, and is not really capable of scaling, so you need to be more careful when using it.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/893c7db6be42"><time class="dt-published" datetime="2024-09-16T02:27:26.987Z">September 16, 2024</time></a>.</p><p><a href="https://medium.com/@lazypro/dockerize-local-rag-with-models-893c7db6be42" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

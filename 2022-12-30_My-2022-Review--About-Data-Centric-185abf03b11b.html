@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>My 2022 Review: About Data-Centric</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">My 2022 Review: About Data-Centric</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+The difference between the perspective of a backend engineer and a data engineer
+</section>
+<section data-field="body" class="e-content">
+<section name="c96d" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="ad01" id="ad01" class="graf graf--h3 graf--leading graf--title">My 2022 Review: About Data-Centric</h3><h4 name="ab43" id="ab43" class="graf graf--h4 graf-after--h3 graf--subtitle">The difference between the perspective of a backend engineer and a data engineer</h4><figure name="e82e" id="e82e" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*B3f-c9YlGN-1Nkuc" data-width="1000" data-height="712" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*B3f-c9YlGN-1Nkuc"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@kmuza" data-href="https://unsplash.com/@kmuza" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Carlos Muza</a> on <a href="https://unsplash.com/photos/hpjSkU2UYSU" data-href="https://unsplash.com/photos/hpjSkU2UYSU" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="a6d2" id="a6d2" class="graf graf--p graf-after--figure">Although I have been working with data in the past, this year, I have been working closely with data engineers and finally fully realized the concept of data-centric.</p><p name="90f7" id="90f7" class="graf graf--p graf-after--p">We all know that applications are made up of data, so as a backend engineer or architect, we must be involved in all kinds of data storage and data structures. How to get the most efficiency out of all kinds of data storage is the goal of every backend engineer, and our focus is on maximizing the throughput of data storage with the most efficient data structures.</p><p name="d3f7" id="d3f7" class="graf graf--p graf-after--p">There are many technical details involved, including but not limited to the following.</p><ol class="postList"><li name="f2d6" id="f2d6" class="graf graf--li graf-after--p">Indexing: improve database query performance.</li><li name="c852" id="c852" class="graf graf--li graf-after--li">Sharding: reduce data volume of datasets.</li><li name="84d4" id="84d4" class="graf graf--li graf-after--li">Caching: use faster medium.</li><li name="9ed3" id="9ed3" class="graf graf--li graf-after--li">Denormalization: pre-aggregate complex query results.</li></ol><p name="3209" id="3209" class="graf graf--p graf-after--li">But for data engineers, the focus is completely different.</p><blockquote name="78b9" id="78b9" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">How to find the answer to a question quickly with a lot of data at hand?</em></blockquote><p name="8478" id="8478" class="graf graf--p graf-after--blockquote">Quick here has a very different meaning to what a backend engineer cares about. Data engineers care about quickness in terms of productivity, so they can use all kinds of complex SQL queries, let’s say over 100 lines, to find the answer, even though the SQL query takes a long time.</p><p name="821b" id="821b" class="graf graf--p graf-after--p">This is the opposite of what the backend engineers care about, which is the speed of response. From the backend engineer’s point of view, such a complex and time-consuming query is unimaginable.</p><p name="0516" id="0516" class="graf graf--p graf-after--p">Data engineers have different data requirements in order to achieve their goals.</p><ol class="postList"><li name="5bb5" id="5bb5" class="graf graf--li graf-after--p">ETL and ELT: make data more structured.</li><li name="65ba" id="65ba" class="graf graf--li graf-after--li">Data Lakehouse: continuous data cleanup and compilation.</li><li name="3aec" id="3aec" class="graf graf--li graf-after--li">Governance: manage data catalogs and lineages.</li></ol><p name="0dc1" id="0dc1" class="graf graf--p graf-after--li">How to organize the data from many sources into a structure that is suitable for use, and put it in an easy-to-access place and reduce the complexity of maintenance is the focus of data engineers.</p><p name="4d8a" id="4d8a" class="graf graf--p graf-after--p">Therefore, let me summarize this year’s experience in one sentence.</p><blockquote name="d4dd" id="d4dd" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">Only those who focus on data and care about data are data engineers.</em></blockquote><p name="bcab" id="bcab" class="graf graf--p graf-after--blockquote">This is the meaning behind data-centric, and I have spent a lot of time this year learning and changing my mindset in order to understand this.</p><h3 name="a88a" id="a88a" class="graf graf--h3 graf-after--p">Data-centric Monitoring</h3><p name="ccd8" id="ccd8" class="graf graf--p graf-after--h3">In fact, the concerns of backend engineers and data engineers are also reflected in the metrics of the monitoring system.</p><p name="c12a" id="c12a" class="graf graf--p graf-after--p">The application quality metrics usually include the following key points.</p><ol class="postList"><li name="886f" id="886f" class="graf graf--li graf-after--p">response latency</li><li name="b3c3" id="b3c3" class="graf graf--li graf-after--li">throughput</li><li name="d244" id="d244" class="graf graf--li graf-after--li">error rate</li></ol><p name="177f" id="177f" class="graf graf--p graf-after--li">However, for data applications, the quality metrics will be as follows.</p><ol class="postList"><li name="8b74" id="8b74" class="graf graf--li graf-after--p">Freshness: time lag between source and landing.</li><li name="f003" id="f003" class="graf graf--li graf-after--li">Completeness: whether data is lost at each stage of transformation.</li><li name="f687" id="f687" class="graf graf--li graf-after--li">Correctness: similar to the above, whether each stage of transformation is correct.</li></ol><p name="94c2" id="94c2" class="graf graf--p graf-after--li">Although, both are applications, they are very different for telemetry. Of course, the underlying infrastructure is also different.</p><h3 name="76d6" id="76d6" class="graf graf--h3 graf-after--p">Data Team Organizations</h3><p name="edd2" id="edd2" class="graf graf--p graf-after--h3">Let’s break down the composition of a data team.</p><p name="f3f2" id="f3f2" class="graf graf--p graf-after--p">From my point of view, a complete data team would have at least two roles with completely different skill sets and totally different responsibilities: data engineer and data analyst.</p><p name="9d82" id="9d82" class="graf graf--p graf-after--p">In my opinion, there is a simple dichotomy between how to differentiate these two roles.</p><ul class="postList"><li name="ec22" id="ec22" class="graf graf--li graf-after--p">Data Analyst: the person who uses data to answer questions.</li><li name="26b7" id="26b7" class="graf graf--li graf-after--li">Data Engineer: the person who generates the “data” above.</li></ul><p name="564d" id="564d" class="graf graf--p graf-after--li">Of course, there are two other roles that can be created depending on how the questions are answered.</p><ul class="postList"><li name="f1b1" id="f1b1" class="graf graf--li graf-after--p">Data Scientist: the person who answers the question through himself.</li><li name="8738" id="8738" class="graf graf--li graf-after--li">Machine learning engineer: answers questions through AI.</li></ul><p name="4ee7" id="4ee7" class="graf graf--p graf-after--li">But for a healthy data team, I believe there needs to be at least a distinction between the roles of data engineer and data analyst. Just as the focus of a backend engineer is different from that of a data engineer, the focus of a data engineer is different from that of a data analyst.</p><h3 name="36eb" id="36eb" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="78a4" id="78a4" class="graf graf--p graf-after--h3">Throughout 2022, I learned a lot of new experiences and was able to find my blind spots in my domain knowledge in a new role.</p><p name="8618" id="8618" class="graf graf--p graf-after--p graf--trailing">As an architect, I believe I still have a lot to learn, so please continue to share and discuss with me in the new year.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/185abf03b11b"><time class="dt-published" datetime="2022-12-30T01:24:35.491Z">December 30, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/my-2022-review-about-data-centric-185abf03b11b" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

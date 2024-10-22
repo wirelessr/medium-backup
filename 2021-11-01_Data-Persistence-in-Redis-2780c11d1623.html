@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Data Persistence in Redis</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Data Persistence in Redis</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Redis does not guarantee zero data loss, even if the strictest setting is turned on. Although fsync every second, we still may lose more…
+</section>
+<section data-field="body" class="e-content">
+<section name="1e5b" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="9504" id="9504" class="graf graf--h3 graf--leading graf--title">Data Persistence in Redis</h3><p name="288e" id="288e" class="graf graf--p graf-after--h3">I had written an <a href="https://lazypro.medium.com/distributed-transaction-introduction-1cd105c830a2" data-href="https://lazypro.medium.com/distributed-transaction-introduction-1cd105c830a2" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">article</a> about the distributed transactions, which mentioned that Redis does not provide data persistence, with only a brief description. Today, I will deep dive into this topic to see how Redis AOF does.</p><p name="5c6c" id="5c6c" class="graf graf--p graf-after--p">TL;DR</p><blockquote name="63d6" id="63d6" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">Redis does not guarantee that the data will not be lost at all, even if the strictest setting is turned on.</em></blockquote><p name="4d04" id="4d04" class="graf graf--p graf-after--blockquote">The strictest setting here is AOF with <code class="markup--code markup--p-code">fsync</code> at every query. Before we are talking about the reason, I will introduce the AOF further.</p><h3 name="632f" id="632f" class="graf graf--h3 graf-after--p">Redis AOF</h3><p name="057c" id="057c" class="graf graf--p graf-after--h3">AOF (Append Only File) is a mechanism like LSM Tree. After Redis server finishes processing the commands from clients, it will write a command log appending to the end of the log file. There are three settings to determine when these logs are actually written to the hard disk.</p><ol class="postList"><li name="bbdb" id="bbdb" class="graf graf--li graf-after--p">No <code class="markup--code markup--li-code">fsync</code> at all</li><li name="71ff" id="71ff" class="graf graf--li graf-after--li"><code class="markup--code markup--li-code">fsync</code> every second</li><li name="ef8d" id="ef8d" class="graf graf--li graf-after--li"><code class="markup--code markup--li-code">fsync</code> at every query</li></ol><p name="f1f0" id="f1f0" class="graf graf--p graf-after--li">The best performance is the first one, and then it gets worse and worse. According to the <a href="https://stackoverflow.com/questions/50478674/redis-aof-fsync-always-vs-lsm-tree" data-href="https://stackoverflow.com/questions/50478674/redis-aof-fsync-always-vs-lsm-tree" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">experiment</a>, we can know the last option works even worse than LSM tree.</p><p name="c383" id="c383" class="graf graf--p graf-after--p">From the <a href="https://redis.io/topics/persistence" data-href="https://redis.io/topics/persistence" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">official manual</a>, it looks like the data is durable when the AOF is enabled. Actually, no, not at all. The trick is the launch time of AOF; If you look closely you will find AOF is starting <strong class="markup--strong markup--p-strong">after</strong> commands are processed. It is not like WAL (Write Ahead Log) of other databases. Therefore, if the command is finished processing, and then the system is crashed, you will obviously lost this operation.</p><h3 name="870b" id="870b" class="graf graf--h3 graf-after--p"><code class="markup--code markup--h3-code">fsync</code> every second</h3><p name="bd20" id="bd20" class="graf graf--p graf-after--h3"><code class="markup--code markup--p-code">fsync</code> at every query makes lots of performance impact, hence we usually adopt <code class="markup--code markup--p-code">fsync</code> every second. This is also the default value in enabling Redis AOF. There comes another question:</p><blockquote name="b9cc" id="b9cc" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">Does this mean I will only lose one second of data?</em></blockquote><p name="64d9" id="64d9" class="graf graf--p graf-after--blockquote">The answer is no. There are two steps in AOF writes logs into the disk.</p><ul class="postList"><li name="c8ea" id="c8ea" class="graf graf--li graf-after--p">WRITE: Write data to file</li><li name="5577" id="5577" class="graf graf--li graf-after--li">SAVE: <code class="markup--code markup--li-code">fsync</code>, i.e., write file to disk</li></ul><p name="3be8" id="3be8" class="graf graf--p graf-after--li">From the implementation of Redis, the flow is as follows:</p><figure name="d749" id="d749" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*7PcTNBS0JCa8mtIBg6HpKw.png" data-width="471" data-height="628" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*7PcTNBS0JCa8mtIBg6HpKw.png"></figure><ul class="postList"><li name="1d1b" id="1d1b" class="graf graf--li graf-after--figure">Scenario 1: Return without WRITE and SAVE</li><li name="6797" id="6797" class="graf graf--li graf-after--li">Scenario 2: WRITE, but no SAVE</li><li name="39e4" id="39e4" class="graf graf--li graf-after--li">Scenario 3: WRITE and SAVE</li></ul><p name="829a" id="829a" class="graf graf--p graf-after--li">To sum up, if the system crashed, you will lost data within 2 seconds. On the other hand, the description in official manual — <em class="markup--em markup--p-em">appendfsync everysec: fsync every second. Fast enough (in 2.4 likely to be as fast as snapshotting), and you can lose 1 second of data if there is a disaster.</em> — is incorrect.</p><p name="18a3" id="18a3" class="graf graf--p graf-after--p">Let me add, in parenthesis, I had attended EuropeCloud Summit 2021, and there is a session, <a href="https://youtu.be/6x_kB3kZA5Q" data-href="https://youtu.be/6x_kB3kZA5Q" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Accelerating Application Modernization and Cloud Migration with Redis</a>, in day 2; one of a slide shows: Zero Data Loss around 9+ years in production. I am curious how he did it, so I thus ask my question; I have got no answer until today.</p><p name="0259" id="0259" class="graf graf--p graf-after--p graf--trailing">Here is my conclusion, using Redis AOF is much more durable, however, it cannot make sure zero data loss. If you want to persist the data as much as possible, you have to not only use AOF but also the replica even as well as RDB at the same time.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/2780c11d1623"><time class="dt-published" datetime="2021-11-01T01:13:20.444Z">November 1, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/data-persistence-in-redis-2780c11d1623" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

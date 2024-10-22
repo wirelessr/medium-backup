@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Leetcode concurrency #1115 Print FooBar Alternately (in golang)</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Leetcode concurrency #1115 Print FooBar Alternately (in golang)</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+繼上篇Print in Order之後，我們繼續挑戰concurrency，這次難度會從easy變成medium，但我覺得還是很簡單。
+</section>
+<section data-field="body" class="e-content">
+<section name="1520" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="3378" id="3378" class="graf graf--h3 graf--leading graf--title">Leetcode concurrency #1115 Print FooBar Alternately (in golang)</h3><figure name="9f0b" id="9f0b" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*J63HW2hlOmBSUCRW.png" data-width="1500" data-height="1000" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*J63HW2hlOmBSUCRW.png"></figure><p name="4622" id="4622" class="graf graf--p graf-after--figure">繼上篇<a href="https://lazypro.medium.com/leetcode-concurrency-1114-print-in-order-in-golang-f3115f6d82c6" data-href="https://lazypro.medium.com/leetcode-concurrency-1114-print-in-order-in-golang-f3115f6d82c6" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Print in Order</a>之後，我們繼續挑戰concurrency，這次難度會從easy變成medium，但我覺得還是很簡單。</p><div name="51d4" id="51d4" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://leetcode.com/problems/print-foobar-alternately/" data-href="https://leetcode.com/problems/print-foobar-alternately/" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://leetcode.com/problems/print-foobar-alternately/"><strong class="markup--strong markup--mixtapeEmbed-strong">Print FooBar Alternately - LeetCode</strong><br><em class="markup--em markup--mixtapeEmbed-em">Suppose you are given the following code: class FooBar { public void foo() { for (int i = 0; i &lt; n; i++) {…</em>leetcode.com</a><a href="https://leetcode.com/problems/print-foobar-alternately/" class="js-mixtapeImage mixtapeImage u-ignoreBlock" data-media-id="de71e4b2513ee30e743aa2f9bb8f5d84" data-thumbnail-img-id="0*h6GzQjelC7316tri" style="background-image: url(https://cdn-images-1.medium.com/fit/c/160/160/0*h6GzQjelC7316tri);"></a></div><p name="60f9" id="60f9" class="graf graf--p graf-after--mixtapeEmbed">一樣先從題目解析開始，跟1114類似，一個class有兩個method，一個會印n次foo；另一個會印n次bar，兩個method個別分別會在不同的執行緒執行，希望最後印出來的結果是foobar重複n次。</p><p name="e669" id="e669" class="graf graf--p graf-after--p">跟上次的前題差不多，因為沒有golang的內建支援，所以main和run都是我的假設。</p><figure name="ed88" id="ed88" class="graf graf--figure graf--iframe graf-after--p"><script src="https://gist.github.com/wirelessr/fcd888e589aadcd681bd3cab920eac0c.js"></script></figure><p name="2337" id="2337" class="graf graf--p graf-after--figure graf--trailing">其實這次的解題思路跟上次87趴像，也是用兩個unbuffered channel互相等待互相指揮，唯一一個差別是channel的開始和結束需要做些判斷，不然會deadlock。所以foo在開始的時候不等，而bar在結束的時候不送。這樣就打完收工。</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/ca9295ee4b16"><time class="dt-published" datetime="2021-03-26T06:30:01.237Z">March 26, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/leetcode-concurrency-1115-print-foobar-alternately-in-golang-ca9295ee4b16" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

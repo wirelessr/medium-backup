@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Make SQL Scan result be map in golang</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Make SQL Scan result be map in golang</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+database/sql is efficient and easy to use but hard to use well. Especially, the fetch result are not a slice.
+</section>
+<section data-field="body" class="e-content">
+<section name="f9cb" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="2dd4" id="2dd4" class="graf graf--h3 graf--leading graf--title">Make SQL Scan result be map in golang</h3><figure name="5aed" id="5aed" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*_4zVsFQup-SamYNi.png" data-width="820" data-height="364" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*_4zVsFQup-SamYNi.png"></figure><p name="013f" id="013f" class="graf graf--p graf-after--figure">When we are using MySQL in golang, we usually adopt <code class="markup--code markup--p-code">database/sql</code> to finish our jobs. In my opinion, the most common driver must be <code class="markup--code markup--p-code">go-sql-driver</code>. It is efficient and easy to use but hard to use well.</p><p name="ed4a" id="ed4a" class="graf graf--p graf-after--p">Especially, the fetch result sets coming from <code class="markup--code markup--p-code">SELECT</code> are not a slice like other dynamic programming languages. In other dynamic language, we expect the results would be a list to represent what columns you want. Moreover, In Python, we can directly fetch the database and get a <code class="markup--code markup--p-code">dict</code> as a result set.</p><p name="8bdb" id="8bdb" class="graf graf--p graf-after--p">In golang, we have to define the variables first, and then manually assign those variables to <code class="markup--code markup--p-code">Scan</code>. This implementation results in 2 problems:</p><ol class="postList"><li name="ef97" id="ef97" class="graf graf--li graf-after--p">If we issued a <code class="markup--code markup--li-code">SELECT *</code>, we will encounter an error if the schema changes in the future.</li><li name="8828" id="8828" class="graf graf--li graf-after--li">If we want to ask for a new column, we have to aware where uses the result sets. And modify them all carefully although they didn’t care the new column.</li></ol><p name="b416" id="b416" class="graf graf--p graf-after--li">To sum up, we need a method to mitigate those common problems after all. My idea comes from Python, I want the result sets to be a <code class="markup--code markup--p-code">map</code>, so that the caller will not be impacted if any change on the database.</p><p name="f7e4" id="f7e4" class="graf graf--p graf-after--p">The solution is as follows:</p><figure name="8317" id="8317" class="graf graf--figure graf--iframe graf-after--p graf--trailing"><script src="https://gist.github.com/wirelessr/58217cafbbe6a37ee61208ba240962fb.js"></script></figure></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/e04f0de5950f"><time class="dt-published" datetime="2021-09-28T09:34:21.261Z">September 28, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/make-sql-scan-result-be-map-in-golang-e04f0de5950f" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

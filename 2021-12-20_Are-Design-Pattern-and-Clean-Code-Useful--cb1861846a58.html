@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Are Design Pattern and Clean Code Useful?</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Are Design Pattern and Clean Code Useful?</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Are design pattern and clean code useful or not? Why can’t we apply in our job? Developers should look ahead.
+</section>
+<section data-field="body" class="e-content">
+<section name="9870" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="6e8b" id="6e8b" class="graf graf--h3 graf--leading graf--title">Are Design Pattern and Clean Code Useful?</h3><figure name="c7bc" id="c7bc" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*QxMg2AdK-5LGu8N3" data-width="1000" data-height="667" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*QxMg2AdK-5LGu8N3"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@ffstop" data-href="https://unsplash.com/@ffstop" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Fotis Fotopoulos</a> on <a href="https://unsplash.com/photos/DuHKoV44prg" data-href="https://unsplash.com/photos/DuHKoV44prg" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="f541" id="f541" class="graf graf--p graf-after--figure">I overheard our junior developers discussing the value of design pattern and clean code. I vaguely remember their conclusion is, “those techniques make simple things become complex, and that is the favorite thing of those technical authorities who are far from the reality”. Their discussion ends up a negative agreement.</p><p name="d78b" id="d78b" class="graf graf--p graf-after--p">There are some examples from their conversation. For instance, in clean code, the length of a function is limited in a regular size, which results in to overlook a whole function’s functionality, it has to dive into several nested sub-functions. Besides, design pattern ask us encapsulate a simple task into an object, and the objects are everywhere. Coding with objects will make the source code much more longer.</p><p name="9ae1" id="9ae1" class="graf graf--p graf-after--p">Well, I can understand their pain points. Those pain points come from some reasons such as</p><ol class="postList"><li name="a513" id="a513" class="graf graf--li graf-after--p">Their duty is quite simple without too many complicated design or further expandability needs.</li><li name="f682" id="f682" class="graf graf--li graf-after--li">In a small organization, they don’t need to consider the cooperation. All features are handled by a few people.</li><li name="e37a" id="e37a" class="graf graf--li graf-after--li">They don’t realize the concepts of those paradigms, instead, they just see the “tricks”.</li></ol><p name="8d12" id="8d12" class="graf graf--p graf-after--li">If I were in their position, I perhaps agreed with them. Nevertheless, I had not joined their discussion. After all, I am more close to an authority for them. But, I have to say in their mentioned examples, those methodologies have its meaning.</p><p name="9535" id="9535" class="graf graf--p graf-after--p">Firstly, restricting the function length must be combined with a well-defined naming convention and a good parameter design to let everyone understand what’s the purpose of this function without traversing the detail implementations. Secondly, encapsulating objects is to accomplish a better abstraction and become easier to achieve Open-Closed Principle. Whether encapsulate logic in Strategy Pattern or encapsulate the creation in Factory Method, they make developers be able to use the existing code without reinventing the wheel. In addition, developers can extend the functionality more easily.</p><p name="363e" id="363e" class="graf graf--p graf-after--p">Design pattern and clean code provide some tricks and principles, however, the most important thing is the spirit and purpose behind them. For example,</p><pre name="bb16" id="bb16" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">if prop == 1:<br>    do_a()<br>elif prop == 2:<br>    do_b()<br>elif prop == 3:<br>    do_c()<br>else:<br>    do_default()</code></pre><p name="ed41" id="ed41" class="graf graf--p graf-after--pre">This simple example can be considered that those <code class="markup--code markup--p-code">do_XX</code> are some flatted source code. Those junior developers would like to see those behaviors clearly on the same code level like the above python example. In order to understand the implementation at a glance, actually, there are many a way to do better.</p><pre name="7af5" id="7af5" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">func = {<br>    1: do_a,<br>    2: do_b,<br>    3: do_c,<br>}</code></pre><pre name="386d" id="386d" class="graf graf--pre graf-after--pre"><code class="markup--code markup--pre-code">if prop in func:<br>    func[prop]()<br>else:<br>    do_default()</code></pre><p name="e151" id="e151" class="graf graf--p graf-after--pre">Through simple packaging, it is easier for people who want to read the code to understand the purpose. They can inquire about the part of details they want to see by themselves. In addition to add a new feature, developers just need a handler in <code class="markup--code markup--p-code">func</code>. Furthermore,</p><pre name="abb2" id="abb2" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">factory.create(prop).run()</code></pre><p name="714b" id="714b" class="graf graf--p graf-after--pre">By adopting the factory method, the function become more slim. The cognitive load for readers is low as well. In fact, this piece of code encapsulate the logic in polymorphism to <code class="markup--code markup--p-code">run</code>, aka, Strategy Pattern. It is unnecessary to talk about these details implementation of design pattern or clean code. Once you understand his spirit, you can easily have your own implementation. In the above example, it is indeed not a “standard” factory method implementation.</p><p name="71e4" id="71e4" class="graf graf--p graf-after--p">After skilled design pattern, those pattern names just provide a common language between developers, so that they can communicate more smoothly. For instance, “I have done an observer pattern over here”. It is no need to explain further that you can realize there are a <code class="markup--code markup--p-code">subject</code> and an <code class="markup--code markup--p-code">observer</code> with <code class="markup--code markup--p-code">attach</code> and <code class="markup--code markup--p-code">notify</code>. Even no documents, you still can understand the prototype of the code in your mind.</p><p name="324c" id="324c" class="graf graf--p graf-after--p graf--trailing">The purpose of coding is not only making features but also be a communication tool. <a href="https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882" data-href="https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Clean Code</a> said, “Don’t document your code. Code your documentation”. But these can only be experienced after those junior developers have written about larger functions, cooperated with more people, and met more changing requirements. Everyone chooses a different career path, and not everyone has the opportunity to enter the world where the design pattern and clean code are facing in.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/cb1861846a58"><time class="dt-published" datetime="2021-12-20T01:09:48.192Z">December 20, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/are-design-pattern-and-clean-code-useful-cb1861846a58" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

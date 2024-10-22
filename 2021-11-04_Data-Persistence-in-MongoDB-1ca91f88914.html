@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Data Persistence in MongoDB</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Data Persistence in MongoDB</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+MongoDB provides the data persistence as long as the write concern is used properly. “{w: majority}” is usually the best choice.
+</section>
+<section data-field="body" class="e-content">
+<section name="6c00" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="4b0d" id="4b0d" class="graf graf--h3 graf--leading graf--title">Data Persistence in MongoDB</h3><figure name="0f41" id="0f41" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*U85yP3O7enCB5MtD.png" data-width="1500" data-height="500" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*U85yP3O7enCB5MtD.png"></figure><p name="78a0" id="78a0" class="graf graf--p graf-after--figure">We have talked about the data persistence in Redis in <a href="https://lazypro.medium.com/data-persistence-in-redis-2780c11d1623" data-href="https://lazypro.medium.com/data-persistence-in-redis-2780c11d1623" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">my previous article</a>, and we had come out a conclusion.</p><blockquote name="936a" id="936a" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">There is no way to ensure no data loss in the </em><strong class="markup--strong markup--blockquote-strong"><em class="markup--em markup--blockquote-em">single instance</em></strong><em class="markup--em markup--blockquote-em"> Redis even the strictest setting is turned on.</em></blockquote><p name="8ded" id="8ded" class="graf graf--p graf-after--blockquote">Because Redis is designed as a in-memory data storage handling the high-throughput user scenarios, aka a cache not a database. Hence, the persistence only needs to be usable not reliable.</p><p name="7a20" id="7a20" class="graf graf--p graf-after--p">On the other hand, MongoDB as a NoSQL database is designed to deal with high-volume data and can be scaled out as needed. How about the data persistence in MongoDB?</p><h3 name="2b27" id="2b27" class="graf graf--h3 graf-after--p">WiredTiger</h3><p name="de73" id="de73" class="graf graf--p graf-after--h3">We are going to talk about MongoDB with the most popular storage engine, WiredTiger. First, I have to tell that MongoDB is able to persist data. However, if you don’t use MongoDB correctly, data would still be lost.</p><p name="bb70" id="bb70" class="graf graf--p graf-after--p">The story starts from the <a href="https://docs.mongodb.com/manual/core/journaling/" data-href="https://docs.mongodb.com/manual/core/journaling/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">journaling</a>. By default, MongoDB stores its data into the memory to improve the performance. After reaching the criteria, MongoDB flushes data to the disk. Until then, the data is finally persisted. The criteria is:</p><ol class="postList"><li name="b7e8" id="b7e8" class="graf graf--li graf-after--p">At every 100 milliseconds (can be adjusted by <code class="markup--code markup--li-code">storage.journal.commitIntervalMs</code>)</li><li name="8020" id="8020" class="graf graf--li graf-after--li">Every 100 MB of data</li></ol><p name="4865" id="4865" class="graf graf--p graf-after--li">The journaling is like Redis AOF, it uses WAL to write data to the disk.</p><h3 name="c5db" id="c5db" class="graf graf--h3 graf-after--p">Write Concern</h3><p name="5d34" id="5d34" class="graf graf--p graf-after--h3">If the behavior of MongoDB is storing data in the memory first, how should I make sure the data is durable? Fortunately, MongoDB provides the write concern to accomplish the data persistence. You can set the write concern to “{j: true}” to make MongoDB acknowledge clients <strong class="markup--strong markup--p-strong">after</strong> the data is stored on the disk. Or, you can use “{w: majority}”, this implies “{j: true}” as well as replicates data to most slaves.</p><p name="0201" id="0201" class="graf graf--p graf-after--p">The connect string also supports the journaling, <code class="markup--code markup--p-code">journal=true</code>. This provides some convenience if you don’t want to assign the write concern every time.</p><h3 name="a7ec" id="a7ec" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="4f4e" id="4f4e" class="graf graf--p graf-after--h3">The data persistence plays a very important role in the system design. In fact, many NoSQL databases have some tricks in them. When you are using them, you should not only use them carefully but also understand the implementations behind them.</p><p name="9a5e" id="9a5e" class="graf graf--p graf-after--p graf--trailing">MongoDB provides the data persistence as long as the write concern is used properly. In my opinion, “{w: majority}” is the best choice when you are considering the write concern. Because, we usually would like our data can be persisted in addition to persist to replicas.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/1ca91f88914"><time class="dt-published" datetime="2021-11-04T04:14:00.706Z">November 4, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/data-persistence-in-mongodb-1ca91f88914" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Resilient Caching in Redis</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Resilient Caching in Redis</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Before the introduction, I will describe what is the resilience.
+</section>
+<section data-field="body" class="e-content">
+<section name="867f" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="9250" id="9250" class="graf graf--h3 graf--leading graf--title">Resilient Caching in Redis</h3><figure name="ff14" id="ff14" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*JGudLbUdBmTefcki" data-width="1000" data-height="667" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*JGudLbUdBmTefcki"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@jeremybishop" data-href="https://unsplash.com/@jeremybishop" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Jeremy Bishop</a> on <a href="https://unsplash.com/photos/vGjGvtSfys4" data-href="https://unsplash.com/photos/vGjGvtSfys4" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="7ef2" id="7ef2" class="graf graf--p graf-after--figure">Before the introduction, I will describe what is the resilience.</p><blockquote name="1e90" id="1e90" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">Distributed systems will fail, a resilient software system will not try to avoid failure but expect it and respond gracefully.</em></blockquote><p name="1abd" id="1abd" class="graf graf--p graf-after--blockquote">We all know data in cache will sooner or later be lost. The reason comes from many situations even the writing operation is successful. Let’s take Redis as an example.</p><ol class="postList"><li name="c66b" id="c66b" class="graf graf--li graf-after--p">Redis server crashed: of course, data was lost, because all data in Redis was stored in the memory.</li><li name="862a" id="862a" class="graf graf--li graf-after--li">Redis replica went through the partition failure and recovered again.</li><li name="7111" id="7111" class="graf graf--li graf-after--li">Even without any hardware/software failure, Redis spent all memory spaces and proceeded to evict the existing cache.</li><li name="d319" id="d319" class="graf graf--li graf-after--li">If using <code class="markup--code markup--li-code">ElastiCache</code> of <code class="markup--code markup--li-code">AWS</code>, the upgrade process will also drop all entries.</li><li name="1b18" id="1b18" class="graf graf--li graf-after--li">And so on.</li></ol><p name="ebe7" id="ebe7" class="graf graf--p graf-after--li">As far as we know, the cache is not reliable and hard to ensure the data consistency. However, there are indeed some tasks which leveraged cache to improve the performance requiring the reliability.</p><p name="edac" id="edac" class="graf graf--p graf-after--p">We have talked about the cardinality counting in <a href="https://lazypro.medium.com/cardinality-counting-in-redis-3c3a472e2d9f" data-href="https://lazypro.medium.com/cardinality-counting-in-redis-3c3a472e2d9f" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">my previous article</a>, and that is a great example to show the importance of data persistence. If the collections in Redis is no longer trusted, how can we design a large system? The solution is making your cache more resilient.</p><h3 name="ee3d" id="ee3d" class="graf graf--h3 graf-after--p">Resilient Collections</h3><p name="7fbd" id="7fbd" class="graf graf--p graf-after--h3">Following my example of health status, we want to make sure our sensor networks work properly; therefore, we record the activity of API calls in Redis. In order to simplify the explanations, I will choose bitmap with recording in days in this section.</p><p name="a4de" id="a4de" class="graf graf--p graf-after--p">The data in Redis bitmap must answer a question, how many days does the sensor work in this month?</p><p name="c248" id="c248" class="graf graf--p graf-after--p">We can leverage my previous statements as follows.</p><pre name="fd89" id="fd89" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">SETBIT sensorA_jan 1 1<br>SETBIT sensorA_jan 2 1<br>SETBIT sensorA_jan 3 1</code></pre><p name="27fc" id="27fc" class="graf graf--p graf-after--pre">The statements show that <code class="markup--code markup--p-code">A</code> worked at 1/1, 1/2 and 1/3. And we can get the answer from: <code class="markup--code markup--p-code">BITCOUNT sensorA_jan</code>. What if the Redis crashed at 1/2? The <code class="markup--code markup--p-code">bitocunt</code> would become 2 without the record of 1/1. In such case, the <code class="markup--code markup--p-code">bitcount</code> is distorted.</p><p name="e169" id="e169" class="graf graf--p graf-after--p">To tackle this issue, we can add an integrity into the collection, let’s say <code class="markup--code markup--p-code">SETBIT sensorA_jan 0 1</code>. When we want to retrieve <code class="markup--code markup--p-code">bitcount</code>, we check the integrity first, <code class="markup--code markup--p-code">GETBIT sensorA_jan 0</code>. If the result is <code class="markup--code markup--p-code">1</code>, which means the <code class="markup--code markup--p-code">bitcount</code> is under controlled, otherwise, we have to rebuild the data from a durable storage like a database.</p><h3 name="9c24" id="9c24" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="0b62" id="0b62" class="graf graf--p graf-after--h3">Since we have to rebuilt the result from a database, why not do it at the first? The reason is quite simple, we want to keep the system high performance. We should ensure the reporting throughput by using cache and expect there should be failed someday. Nevertheless, we still can get the correct result by some heavy aggregating operations on the database.</p><p name="3d68" id="3d68" class="graf graf--p graf-after--p graf--trailing">This is how resilience does, and this article provides a straightforward example to demonstrate how to accomplish a cardinality counting resiliently.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/a5b3c1a49f14"><time class="dt-published" datetime="2022-01-10T01:14:36.350Z">January 10, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/resilient-caching-in-redis-a5b3c1a49f14" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

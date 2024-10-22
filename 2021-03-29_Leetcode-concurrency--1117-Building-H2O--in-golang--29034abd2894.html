@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Leetcode concurrency #1117 Building H2O (in golang)</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Leetcode concurrency #1117 Building H2O (in golang)</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+今天的題目掙扎了一下，主要是對golang沒這麼熟，花了點時間試誤，最後還是選擇土法煉鋼的解。前幾天，我們試過同步處理中的Event和Lock，今天依然是解同步處理的問題，這次嘗試用號誌來解決。
+</section>
+<section data-field="body" class="e-content">
+<section name="76a6" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="6baa" id="6baa" class="graf graf--h3 graf--leading graf--title">Leetcode concurrency #1117 Building H2O (in golang)</h3><figure name="66a3" id="66a3" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*XZrhehc1KuPcVrJz.jpg" data-width="1466" data-height="802" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*XZrhehc1KuPcVrJz.jpg"></figure><p name="aabf" id="aabf" class="graf graf--p graf-after--figure">今天的題目掙扎了一下，主要是對golang沒這麼熟，花了點時間試誤，最後還是選擇土法煉鋼的解。前幾天，我們試過同步處理中的Event和Lock，今天依然是解同步處理的問題，這次嘗試用號誌來解決。</p><div name="c970" id="c970" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://leetcode.com/problems/building-h2o/" data-href="https://leetcode.com/problems/building-h2o/" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://leetcode.com/problems/building-h2o/"><strong class="markup--strong markup--mixtapeEmbed-strong">Building H2O - LeetCode</strong><br><em class="markup--em markup--mixtapeEmbed-em">There are two kinds of threads, oxygen and hydrogen. Your goal is to group these threads to form water molecules. There…</em>leetcode.com</a><a href="https://leetcode.com/problems/building-h2o/" class="js-mixtapeImage mixtapeImage u-ignoreBlock" data-media-id="7a959d21fa32937c857ed443c7606251" data-thumbnail-img-id="0*eidKXXmGy3tS4Aub" style="background-image: url(https://cdn-images-1.medium.com/fit/c/160/160/0*eidKXXmGy3tS4Aub);"></a></div><p name="c7c8" id="c7c8" class="graf graf--p graf-after--mixtapeEmbed">題目解析：給一串字串僅包含H和O兩種字母，而且H的數量一定要是O的兩倍。接著起一堆thread，每個thread只可能會有印出H或印出O這兩個功能，目的是要將輸入的字串整理成HHOHHOHHO...的序列。</p><p name="ff2f" id="ff2f" class="graf graf--p graf-after--p">這題的難處在於一狗票的thread同時跑起來，要能夠快速知道甚麼時候開始印H又哪時候要印O。看到題目的第一直覺就是semaphore，只要起兩個semaphore，一個設2來決定H、另一個也設2來決定O就可以了。但是，碰到幾個問題：首當其衝的是，golang的sync裡沒有semaphore的實作，必須使用golang.org/x/sync/semaphore下的Weighted；另一個問題是，在這個package底下實作的Release不會空等，在沒有Acquire足夠數量的前題下，直接使用Release就panic。</p><blockquote name="183d" id="183d" class="graf graf--blockquote graf-after--p">semaphore: released more than held</blockquote><p name="65db" id="65db" class="graf graf--p graf-after--blockquote">正常的流程是H thread，先Acquire(H1)，若是可行，就印出H然後，Acquire(O1)來通知O開始跑；而O thread的流程是，先Release(O2)，若是可行，就印出O並且Release(H2)來告訴下一輪的H。但用原來的Release，O在第一次Release(O2)就會炸。因此我把整個package拷貝過來，並且修改Release的作法，做成類似自旋鎖的概念。</p><figure name="71a4" id="71a4" class="graf graf--figure graf--iframe graf-after--p"><script src="https://gist.github.com/wirelessr/4ba39b1ce19dd9c9b24f0e42a31111db.js"></script></figure><p name="6e84" id="6e84" class="graf graf--p graf-after--figure graf--trailing">中間一大段拷貝可以略過不用看，幾乎都和原來的一樣，除了Release被我大改之外。當Release的問題解決之後，其實解法就和剛剛描述的流程一樣，從code可以很清楚的看到hydrogen和oxygen的實作都很簡單。</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/29034abd2894"><time class="dt-published" datetime="2021-03-29T09:29:47.842Z">March 29, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/leetcode-concurrency-1117-building-h2o-in-golang-29034abd2894" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

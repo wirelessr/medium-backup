@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Implementing API Versioning</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Implementing API Versioning</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Emulating Shopify’s API Versioning Strategy
+</section>
+<section data-field="body" class="e-content">
+<section name="235a" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="2e53" id="2e53" class="graf graf--h3 graf--leading graf--title">Implementing API Versioning</h3><h4 name="277d" id="277d" class="graf graf--h4 graf-after--h3 graf--subtitle">Emulating Shopify’s API Versioning Strategy</h4><figure name="cbac" id="cbac" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*jwutXmLGWKadg8Gl" data-width="1000" data-height="653" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*jwutXmLGWKadg8Gl"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@synkevych" data-href="https://unsplash.com/@synkevych" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Roman Synkevych</a> on <a href="https://unsplash.com/photos/wX2L8L-fGeA" data-href="https://unsplash.com/photos/wX2L8L-fGeA" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="04a7" id="04a7" class="graf graf--p graf-after--figure">For a public API to be called by a user, it is common practice to use versioning to control the impact. For example, when a user calls an API and expects certain results, a change in the API’s interface or behavior can cause unpredictable risks for the caller. Therefore, in practice, the original API will be tuned to version 1, and the modified API to version 2.</p><p name="6d5c" id="6d5c" class="graf graf--p graf-after--p">Users can be sure that calling the original version 1 API will not cause any problems, and the service providing the API can continue to iterate on the functionality, both sides of the development cycle can be independent of each other. Of course, maintaining two sets of APIs increases the maintenance effort for the service provider, so APIs have a lifecycle and don’t live forever.</p><p name="b75d" id="b75d" class="graf graf--p graf-after--p">In the case of the AWS services, the APIs called by the SDK have a version number (named by date), so it is recommended to specify the version of the used API in the production environment.</p><p name="d537" id="d537" class="graf graf--p graf-after--p">The following is an example of the AWS Python SDK, <em class="markup--em markup--p-em">boto3</em>, which according to the <a href="https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-a-configuration-file" data-href="https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-a-configuration-file" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">official document</a>, <code class="markup--code markup--p-code">api_versions</code> should be specified in AWS configure. The version change of each service is available in this channel.</p><div name="6edf" id="6edf" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://awsapichanges.info/" data-href="https://awsapichanges.info/" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://awsapichanges.info/"><strong class="markup--strong markup--mixtapeEmbed-strong">API Changes</strong><br><em class="markup--em markup--mixtapeEmbed-em">Changes This release introduces custom SQL queries - an expanded set of SQL you can run. This release adds analysis…</em>awsapichanges.info</a><a href="https://awsapichanges.info/" class="js-mixtapeImage mixtapeImage mixtapeImage--empty u-ignoreBlock" data-media-id="7763ad337eb204710f26d9954d8ba9a1"></a></div><p name="fba5" id="fba5" class="graf graf--p graf-after--mixtapeEmbed">In fact, there are many different ways of implementing API versioning, and one interesting example is Shopify, according to Shopify’s official document, we know that Shopify releases one version per quarter and maintains only four versions at a time, i.e. one year.</p><p name="dd47" id="dd47" class="graf graf--p graf-after--p">Versions are date-named and embedded directly in the URL, and those out-of-date versions fallback to the oldest version in available support.</p><p name="b732" id="b732" class="graf graf--p graf-after--p">In other words, suppose the current four versions are as follows.</p><ul class="postList"><li name="ac6d" id="ac6d" class="graf graf--li graf-after--p">2023–07</li><li name="0762" id="0762" class="graf graf--li graf-after--li">2023–04</li><li name="25d2" id="25d2" class="graf graf--li graf-after--li">2023–01</li><li name="18ae" id="18ae" class="graf graf--li graf-after--li">2022–10</li></ul><p name="4b8e" id="4b8e" class="graf graf--p graf-after--li">Then the call to 2022–07 would use the version 2022–10.</p><p name="a977" id="a977" class="graf graf--p graf-after--p">This is an interesting way of implementation, as the client has one year to make changes, and if it doesn’t, it will still work, but with unexpected results, instead of just crashing.</p><p name="ded6" id="ded6" class="graf graf--p graf-after--p">How to implement such a versioning mechanism? This article provides a possible approach.</p><h3 name="d253" id="d253" class="graf graf--h3 graf-after--p">Implementation approach</h3><p name="ca72" id="ca72" class="graf graf--p graf-after--h3">The full source is in the following repo.</p><div name="eb79" id="eb79" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://github.com/wirelessr/versioning" data-href="https://github.com/wirelessr/versioning" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://github.com/wirelessr/versioning"><strong class="markup--strong markup--mixtapeEmbed-strong">GitHub - wirelessr/versioning: Test API versioning</strong><br><em class="markup--em markup--mixtapeEmbed-em">Test API versioning. Contribute to wirelessr/versioning development by creating an account on GitHub.</em>github.com</a><a href="https://github.com/wirelessr/versioning" class="js-mixtapeImage mixtapeImage u-ignoreBlock" data-media-id="cf67518550163ef2378034a6dad2bbe7" data-thumbnail-img-id="0*tPQpL3Fjp7rgms7e" style="background-image: url(https://cdn-images-1.medium.com/fit/c/160/160/0*tPQpL3Fjp7rgms7e);"></a></div><p name="25cb" id="25cb" class="graf graf--p graf-after--mixtapeEmbed">The overall implementation architecture is as follows.</p><figure name="81e0" id="81e0" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*MxyBZHS2MCui3vduhtm3wQ.png" data-width="812" data-height="502" src="https://cdn-images-1.medium.com/max/800/1*MxyBZHS2MCui3vduhtm3wQ.png"></figure><p name="d8a4" id="d8a4" class="graf graf--p graf-after--figure">All three services implement two URIs: <code class="markup--code markup--p-code">/hello</code> and <code class="markup--code markup--p-code">/hi</code>, which just print the URI with a version number.</p><p name="f959" id="f959" class="graf graf--p graf-after--p">For users, to call the corresponding service, they just put a prefix in front of the URI, e.g. <code class="markup--code markup--p-code">curl http://localhost/v2/hello</code> would print out</p><blockquote name="24ac" id="24ac" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">hello v2</em></blockquote><p name="4500" id="4500" class="graf graf--p graf-after--blockquote">In addition, calling a non-white-listed (v1, v2 and v3) version will fallback to v1, e.g., <code class="markup--code markup--p-code">curl http://localhost/v4/hello</code> will print</p><blockquote name="b9a1" id="b9a1" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">hello v1</em></blockquote><p name="fb1f" id="fb1f" class="graf graf--p graf-after--blockquote">The core of this experiment is nginx on the gateway.</p><pre data-code-block-mode="2" spellcheck="false" data-code-block-lang="bash" name="e1ee" id="e1ee" class="graf graf--pre graf-after--p graf--preV2"><span class="pre--content">http {<br />    server {<br />        listen 80;<br /><br />        location ^~ /v1/ {<br />            rewrite /v1/(.*) /<span class="hljs-variable">$1</span> <span class="hljs-built_in">break</span>;<br />            proxy_pass http://web_v1;<br />        }<br />        location ^~ /v2/ {<br />            rewrite /v2/(.*) /<span class="hljs-variable">$1</span> <span class="hljs-built_in">break</span>;<br />            proxy_pass http://web_v2;<br />        }<br />        location ^~ /v3/ {<br />            rewrite /v3/(.*) /<span class="hljs-variable">$1</span> <span class="hljs-built_in">break</span>;<br />            proxy_pass http://web_v3;<br />        }<br />        location ~ /v(\d+)/ {<br />            rewrite /v(\d+)/(.*) /<span class="hljs-variable">$2</span> <span class="hljs-built_in">break</span>;<br />            proxy_pass http://web_v1;<br />        }<br />    }<br />}</span></pre><p name="0322" id="0322" class="graf graf--p graf-after--pre">If the location matches the previous 3 rules, then rewrite the original URI, remove the prefix and redirect to the corresponding service, if it doesn’t match the previous rules but matches the version specification (v plus integer), then redirect to the v1 service anyway.</p><p name="4f61" id="4f61" class="graf graf--p graf-after--p">By using nginx regex, we can make the version match the corresponding service and implement the extra fallback mechanism.</p><h3 name="63ec" id="63ec" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="7def" id="7def" class="graf graf--p graf-after--h3">Actually, there is another approach to provide various versions of the API in the original service, for instance, opening several endpoints directly in the API service as follows.</p><ul class="postList"><li name="95a1" id="95a1" class="graf graf--li graf-after--p">/v1/hello</li><li name="9c69" id="9c69" class="graf graf--li graf-after--li">/v2/hello</li><li name="c11e" id="c11e" class="graf graf--li graf-after--li">/v3/hello</li></ul><p name="6254" id="6254" class="graf graf--p graf-after--li">Creating three versions of the API directly instead of adding a prefix to the API through the gateway is not recommended. If you don’t physically isolate them, it adds a lot of development overhead, as in the following real-world example.</p><figure name="69b8" id="69b8" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*TGLKfqn1R6kLdOURKkjuWw.png" data-width="602" data-height="608" src="https://cdn-images-1.medium.com/max/800/1*TGLKfqn1R6kLdOURKkjuWw.png"></figure><p name="e419" id="e419" class="graf graf--p graf-after--figure">When we need to modify the behavior of the common lib, it will inevitably affect <code class="markup--code markup--p-code">v1</code>, which makes it difficult to iterate on the functionality, and also introduces risk to the user.</p><p name="1519" id="1519" class="graf graf--p graf-after--p graf--trailing">Therefore, isolation at the physical level is more controllable than isolation at the logical level. This article provides a possible approach, but there are many other implementations that can achieve the same result, so feel free to share them with me.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/904ac4527766"><time class="dt-published" datetime="2023-08-07T01:43:00.482Z">August 7, 2023</time></a>.</p><p><a href="https://medium.com/@lazypro/implementing-api-versioning-904ac4527766" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

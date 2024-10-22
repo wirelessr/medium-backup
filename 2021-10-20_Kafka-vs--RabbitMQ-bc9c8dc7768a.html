@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Kafka vs. RabbitMQ</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Kafka vs. RabbitMQ</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+I’ve written this article for explaining what’s the main difference between Kafka and RabbitMQ. I know there are a lot of articles that try…
+</section>
+<section data-field="body" class="e-content">
+<section name="ce66" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="daf1" id="daf1" class="graf graf--h3 graf--leading graf--title">Kafka vs. RabbitMQ</h3><p name="5a0b" id="5a0b" class="graf graf--p graf-after--h3">I’ve written this article for explaining what’s the main difference between Kafka and RabbitMQ. I know there are a lot of articles that try to compare them on their capabilities like message routing, performance, persistence, etc. I like <a href="https://tarunbatra.com/blog/comparison/How-to-choose-between-Kafka-and-RabbitMQ/" data-href="https://tarunbatra.com/blog/comparison/How-to-choose-between-Kafka-and-RabbitMQ/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">this post</a> the most, which gives a precise and fair summary to both of them.</p><p name="7053" id="7053" class="graf graf--p graf-after--p">Nevertheless, those articles all stand on the server-side to consider how to choose Kafka or RabbitMQ. They rarely consider from the client-side, i.e the story on workers. In my opinion, both Kafka and RabbitMQ itself work very well on every use case. The most common thing we encounter is not that the server cannot handle messages, but the workers are too slow to process messages. If the workers indeed cannot afford the workload, we usually adopt horizontal scaling to increase the throughput.</p><h3 name="90c9" id="90c9" class="graf graf--h3 graf-after--p">RabbitMQ</h3><p name="0e91" id="0e91" class="graf graf--p graf-after--h3">I demonstrate this scenario as follows:</p><figure name="ee7d" id="ee7d" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*YbHIx7PDhA2NeSbQTDsb0A.png" data-width="378" data-height="348" src="https://cdn-images-1.medium.com/max/800/1*YbHIx7PDhA2NeSbQTDsb0A.png"></figure><p name="22ad" id="22ad" class="graf graf--p graf-after--figure">The <em class="markup--em markup--p-em">MQ</em> represents either RabbitMQ or other message queue systems. In this case, we can extend the number of workers to handle more messages at the same time. However, the order of messages cannot be preserved. RabbitMQ treats every message as a standalone entity and can be dispatched to any one of the unified workers. In fact, you can set up a complex exchange and routing rule to ensure the message ordering manually. If you do so, you will introduce the complexity in a system and significantly make a tightly coupling between producers and consumers.</p><h3 name="52b2" id="52b2" class="graf graf--h3 graf-after--p">Kafka</h3><p name="916f" id="916f" class="graf graf--p graf-after--h3">How to deal with this problem? I mean how does Kafka preserve the message order. The illustration is:</p><figure name="3abb" id="3abb" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*-9tHhnvNv7Iy316wj4x1yw.png" data-width="498" data-height="307" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*-9tHhnvNv7Iy316wj4x1yw.png"></figure><p name="fc20" id="fc20" class="graf graf--p graf-after--figure">The magic is a producer still publishes a message to a topic, but Kafka pushes the message into the corresponding partition based on the key. Consumers can be a consumer group, and the consumers in the same group will be dispatched to the certain partition(s). In other words, the same kind of messages are processed on the same consumer to make sure the correctness of orderings. Furthermore, the participants in a consumer group can be dynamically adjusted to sort out the run-time workload.</p><h3 name="c776" id="c776" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="fe2e" id="fe2e" class="graf graf--p graf-after--h3 graf--trailing">From my point of view, if the user scenario is the producer generates lots of messages, and you have to add more consumers to digest them, you should use Kafka. Otherwise, Kafka and RabbitMQ both are great tools, you can choose according to the technology stack in your organization.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/bc9c8dc7768a"><time class="dt-published" datetime="2021-10-20T02:49:09.674Z">October 20, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/kafka-vs-rabbitmq-bc9c8dc7768a" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

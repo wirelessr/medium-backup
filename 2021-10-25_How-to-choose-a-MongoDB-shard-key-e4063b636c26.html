@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>How to choose a MongoDB shard key</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">How to choose a MongoDB shard key</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+I will show you what is the ideal pattern of a MongoDB shard key and the concepts behind it.
+</section>
+<section data-field="body" class="e-content">
+<section name="92c9" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="a739" id="a739" class="graf graf--h3 graf--leading graf--title">How to choose a MongoDB shard key</h3><figure name="30ce" id="30ce" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*huNV3uOmTLrTv1Z0.png" data-width="1500" data-height="500" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*huNV3uOmTLrTv1Z0.png"></figure><p name="cb35" id="cb35" class="graf graf--p graf-after--figure">In this article, I will show you what is the ideal pattern of a MongoDB shard key. Although there is a good page on the <a href="https://docs.mongodb.com/manual/core/sharding-choose-a-shard-key/" data-href="https://docs.mongodb.com/manual/core/sharding-choose-a-shard-key/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">MongoDB official manual</a>, it still does not provide a formula to choose a shard key.</p><p name="3350" id="3350" class="graf graf--p graf-after--p">TL;DR</p><p name="4952" id="4952" class="graf graf--p graf-after--p">The formula is</p><blockquote name="8213" id="8213" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">{coarselyAscending : 1, searchPattern : 1}</em></blockquote><p name="2f36" id="2f36" class="graf graf--p graf-after--blockquote">I will explain the reason in the following sections.</p><h3 name="9e05" id="9e05" class="graf graf--h3 graf-after--p">User Scenario</h3><p name="593d" id="593d" class="graf graf--p graf-after--h3">In order to well-describe the formula, I will use an example to illustrate the scenario. There is a collection within application logs, and the format is like:</p><pre name="58f8" id="58f8" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">{<br>    &quot;id&quot;: &quot;4df16cf0-2699-410f-a07e-ca0bc3d3e153&quot;,<br>    &quot;type&quot;: &quot;app&quot;,<br>    &quot;level&quot;: &quot;high&quot;,<br>    &quot;ts&quot;: 1635132899,<br>    &quot;msg&quot;: &quot;Database crash&quot;<br>}</code></pre><p name="14c0" id="14c0" class="graf graf--p graf-after--pre">Each log has the same template, <code class="markup--code markup--p-code">id</code> is a <code class="markup--code markup--p-code">UUID</code>, <code class="markup--code markup--p-code">ts</code> is an epoch, and both <code class="markup--code markup--p-code">type</code> and <code class="markup--code markup--p-code">level</code> are a finite enumeration. I will leverage the terminologies in the official manual to explain some incorrect designs.</p><h3 name="a09b" id="a09b" class="graf graf--h3 graf-after--p">Low Cardinality Shard Key</h3><p name="3187" id="3187" class="graf graf--p graf-after--h3">From the mentioned example, we usually choose <code class="markup--code markup--p-code">type</code> at first sight. Because we always use <code class="markup--code markup--p-code">type</code> to identify the logging scope. However, if we choose the <code class="markup--code markup--p-code">type</code> as the shard key, it must encounter a hot-spot problem. Hot-spot problem means there is a shard size much larger than others. For example, there are 3 shards corresponding to 3 types of logs, app, web, and admin, the most popular user is on app. Therefore, the shard size with app log will be very large. Furthermore, due to the low-cardinality shard key, the shards cannot be rebalanced anymore.</p><h3 name="7cde" id="7cde" class="graf graf--h3 graf-after--p">Ascending Shard Key</h3><p name="f69e" id="f69e" class="graf graf--p graf-after--h3">Alright, if <code class="markup--code markup--p-code">type</code> cannot be the shard key, how about <code class="markup--code markup--p-code">ts</code>? We always search for the most recently logs, and <code class="markup--code markup--p-code">ts</code> are fully uniform distributed, it should be a proper choice. Actually, no. When the shard key is an ascending data, it works at the very first time. Nevertheless, it will result in a performance impact soon. The reason is <code class="markup--code markup--p-code">ts</code> is always ascending, so the data will always insert into the last shard. The last shard will be rebalanced frequently. Worst of all, the query pattern used to search from the last shard as well, i.e. the search will often be the rebalance period.</p><h3 name="6f92" id="6f92" class="graf graf--h3 graf-after--p">Random Shard Key</h3><p name="754a" id="754a" class="graf graf--p graf-after--h3">Based on the previous sections, we know <code class="markup--code markup--p-code">type</code>, <code class="markup--code markup--p-code">level</code> and <code class="markup--code markup--p-code">ts</code> all are not good shard key candidates. Thus, we can use <code class="markup--code markup--p-code">id</code> as the shard key, so that we can spread the data evenly without frequent changes. This approach will work fine when the data set is limited. After the data set becomes huge, the overhead of rebalance will be very high. Because the data is random, MongoDB has to random access the data while rebalancing. On the other hand, if the data is ascending, MongoDB can retrieve the data chunks via the sequential access.</p><h3 name="090b" id="090b" class="graf graf--h3 graf-after--p">Solution</h3><p name="6464" id="6464" class="graf graf--p graf-after--h3">A good MongoDB shard key should be like this:</p><blockquote name="dbab" id="dbab" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">{coarselyAscending : 1, searchPattern : 1}</em></blockquote><p name="3b27" id="3b27" class="graf graf--p graf-after--blockquote">In order to prevent the random access, we choose the coarsely ascending data be the former. This pick also won’t meet the problem of frequently rebalancing. And we put a search pattern on the latter to ensure the related data can be located at the same shard as much as possible. In our example, I will not only choose the shard key but also redesign our search pattern. The <code class="markup--code markup--p-code">ts</code> is fine to address the log at the specific time; however, it is a bit inefficient for a time range query like from 3 month ago til now. Hence, I will add one more key, <code class="markup--code markup--p-code">month</code>, in the document, so we therefore can leverage the MongoDB date type and make a proper shard key. The collection will be:</p><pre name="d3eb" id="d3eb" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">{<br>    &quot;id&quot;: &quot;4df16cf0-2699-410f-a07e-ca0bc3d3e153&quot;,<br>    &quot;type&quot;: &quot;app&quot;,<br>    &quot;level&quot;: &quot;high&quot;,<br>    &quot;ts&quot;: 1635132899,<br>    &quot;msg&quot;: &quot;Database crash&quot;,<br>    &quot;month&quot;: new Date(2021, 10) // only month<br>}</code></pre><p name="bff1" id="bff1" class="graf graf--p graf-after--pre">And, the shard key is <code class="markup--code markup--p-code">{month: 1, type: 1}</code>.</p><p name="e89c" id="e89c" class="graf graf--p graf-after--p">The key point here is we use <code class="markup--code markup--p-code">month</code> instead of <code class="markup--code markup--p-code">ts</code> to avoid frequently rebalancing. The <code class="markup--code markup--p-code">month</code> is not made just for the shard key; on the contrary, we also use it for our search pattern. Instead of calculating the relationship between timestamp and the date, we can use <code class="markup--code markup--p-code">getMonth</code> to find results faster. For instance,</p><pre name="55bf" id="55bf" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">var d = new Date();<br>d.setMonth(d.getMonth() - 1); //1 month ago<br>db.data.find({month:{$gte: d}});</code></pre><p name="ecc6" id="ecc6" class="graf graf--p graf-after--pre graf--trailing">To sum up, this article provides the concepts of designing MongoDB shard key. You might not have a coarsely ascending data so, but you can refer to the concepts and find out a proper key design for your applications.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/e4063b636c26"><time class="dt-published" datetime="2021-10-25T06:21:05.668Z">October 25, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/how-to-choose-a-mongodb-shard-key-e4063b636c26" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

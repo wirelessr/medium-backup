@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Archiving MongoDB Changes to AWS S3</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Archiving MongoDB Changes to AWS S3</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Understanding Hot-Cold Separation
+</section>
+<section data-field="body" class="e-content">
+<section name="87ef" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="dc7b" id="dc7b" class="graf graf--h3 graf--leading graf--title">Archiving MongoDB Changes to AWS S3</h3><h4 name="4018" id="4018" class="graf graf--h4 graf-after--h3 graf--subtitle">Understanding Hot-Cold Separation</h4><figure name="9222" id="9222" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*56Tzkt4dh5wRxRCi" data-width="1000" data-height="667" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*56Tzkt4dh5wRxRCi"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@veverkolog" data-href="https://unsplash.com/@veverkolog" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Dušan veverkolog</a> on <a href="https://unsplash.com/photos/602Cf9KHvS0" data-href="https://unsplash.com/photos/602Cf9KHvS0" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="e56b" id="e56b" class="graf graf--p graf-after--figure">In this article, we are going to introduce how to archive the audit logs stored in MongoDB to AWS S3, but before we start, let’s understand why we need it and the meaning of the need.</p><p name="bfd5" id="bfd5" class="graf graf--p graf-after--p">Audit logs are records of user actions on the system, including signing in and out, modifying data, enabling a feature, and so on. These records are kept as part of the system security, and recent data is made available for users to view. Users may be interested in the last three months of related operations, but not in records older than that.</p><p name="530a" id="530a" class="graf graf--p graf-after--p">Therefore, data that is older than three months is classified as hot data, while data that is older than three months gradually becomes warmer, i.e., rarely accessed, perhaps sometimes still. Data older than six months will be completely cold and will not be accessed except for data analysis and internal system auditing, and users will not care about the existence of such data.</p><p name="409f" id="409f" class="graf graf--p graf-after--p">That is to say, if these cold data are still in the original database, it will consume a lot of resources, including hard disk space and indexes. So, we need a way to archive these data to a lower cost storage space, but we still need to make the cold data directly available when they are to be analyzed, instead of doing further migration.</p><p name="93fc" id="93fc" class="graf graf--p graf-after--p">So, today’s title tells you that we will archive the data in MongoDB to AWS S3.</p><p name="c710" id="c710" class="graf graf--p graf-after--p">There are several advantages to S3, first of all, the data in AWS S3 can be easily analyzed and SQL-compatible queries can be performed through AWS Athena.</p><p name="ac5b" id="ac5b" class="graf graf--p graf-after--p">In addition, S3 is also a storage option supported by many data analytics platforms, such as Apache Spark.</p><p name="c08b" id="c08b" class="graf graf--p graf-after--p">Furthermore, storage cost of S3 is very low. Moreover, if it is determined that the data in S3 is for preservation purposes only and not for query purposes, it can be easily transferred to much lower cost storage, such as AWS Glacier.</p><h3 name="f812" id="f812" class="graf graf--h3 graf-after--p">Hot-Cold Separation on MongoDB</h3><p name="7138" id="7138" class="graf graf--p graf-after--h3">Now let’s review the requirement again.</p><p name="229e" id="229e" class="graf graf--p graf-after--p">In order to reduce the storage cost, we need to move the past audit logs from MongoDB to AWS S3. In addition, we want this to be fully automated, and I don’t believe anyone wants to manually migrate data periodically.</p><p name="9820" id="9820" class="graf graf--p graf-after--p">So what’s the best way to do this? Yes, through streaming.</p><p name="32c2" id="32c2" class="graf graf--p graf-after--p">We have three things to do.</p><ol class="postList"><li name="13be" id="13be" class="graf graf--li graf-after--p">Pass the events from the new audit log through MongoDB’s CDC (and ignore the delete events).</li><li name="52c9" id="52c9" class="graf graf--li graf-after--li">The stream processor archives the stream events into AWS S3.</li><li name="f2db" id="f2db" class="graf graf--li graf-after--li">Use MongoDB’s TTL index to automatically delete expired data when adding audit logs.</li></ol><p name="6dab" id="6dab" class="graf graf--p graf-after--li">By the way, the MongoDB mentioned here is not a self-hosted database, but a managed platform through Atlas. However, the same approach still applies to self-hosted databases, just with a little more setup and implementation than the managed platform.</p><p name="bffb" id="bffb" class="graf graf--p graf-after--p">After knowing what to do, let’s work out a solution.</p><figure name="81ce" id="81ce" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*84TBqEDTbTZ-ksnX.png" data-width="2122" data-height="462" src="https://cdn-images-1.medium.com/max/800/0*84TBqEDTbTZ-ksnX.png"></figure><h3 name="4980" id="4980" class="graf graf--h3 graf-after--figure">Approach Details</h3><p name="a381" id="a381" class="graf graf--p graf-after--h3">Then, let’s explain the whole solution in detail and provide some key points worth discussing.</p><p name="8924" id="8924" class="graf graf--p graf-after--p">The front services and databases are original to the architecture, only the back of the streaming chain is new. The entire chain ends with our destination, AWS S3.</p><p name="04ee" id="04ee" class="graf graf--p graf-after--p">The first thing to do is to turn on Atlas’ built-in feature, <a href="https://www.mongodb.com/docs/atlas/triggers/eventbridge/" data-href="https://www.mongodb.com/docs/atlas/triggers/eventbridge/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">EventBridge Triggers</a>, and since it is a built-in feature, it only requires a few simple settings following the official documentation. There are a few key points to note here, first we only need to send INSERT events, and we need to turn on the option to send full documents so that we can save the complete audit data.</p><p name="eb25" id="eb25" class="graf graf--p graf-after--p">Next, we need to add a new rule to EventBridge’s third-party rules: all incoming events are sent to Kinesis, so that the source of the stream is established.</p><p name="fa91" id="fa91" class="graf graf--p graf-after--p">In order to fully automate S3 archiving and save transmission costs as much as possible, we add Kinesis Firehose as the stream aggregator in the middle of Kinesis and S3. Through Firehose, we can aggregate a stream of events into a batch, and write to S3 in a batch process to save S3’s transmission cost.</p><p name="0512" id="0512" class="graf graf--p graf-after--p">In this way, a fully automatic archiving is accomplished. All audit logs written to MongoDB will be archived into AWS S3 through streams.</p><p name="3480" id="3480" class="graf graf--p graf-after--p">Let’s discuss a few topics.</p><h3 name="82e9" id="82e9" class="graf graf--h3 graf-after--p">Why not just let the service write S3 directly?</h3><p name="0076" id="0076" class="graf graf--p graf-after--h3">There are two reasons.</p><p name="17f5" id="17f5" class="graf graf--p graf-after--p">The first is that we can achieve the purpose without changing the original application by such modification.</p><p name="057e" id="057e" class="graf graf--p graf-after--p">The other reason is that audit logs usually require transactional consistency, and it is difficult to ensure that MongoDB and AWS S3 are consistent when the primary database is MongoDB. What if writing MongoDB succeeds, but writing S3 fails?</p><h3 name="f607" id="f607" class="graf graf--h3 graf-after--p">Why Kinesis and Firehose?</h3><p name="0181" id="0181" class="graf graf--p graf-after--h3">In fact, we can retain one of them, if we want to keep only one I propose to keep Firehose, because we can reduce transmission costs through batch processing.</p><p name="7ec5" id="7ec5" class="graf graf--p graf-after--p">But Kinesis has a benefit, if we later want to introduce event-driven architecture or streaming processing architecture, Kinesis can provide a very good extensibility.</p><h3 name="647a" id="647a" class="graf graf--h3 graf-after--p">Does MongoDB’s TTL index affect database performance?</h3><p name="4a60" id="4a60" class="graf graf--p graf-after--h3">Yes, it does, but the impact is limited in this context. This is because we will only keep the data for a certain period of time, for example, three months.</p><p name="7b0d" id="7b0d" class="graf graf--p graf-after--p">Therefore, the amount of data is limited and the impact on the database is manageable.</p><h3 name="853b" id="853b" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="b413" id="b413" class="graf graf--p graf-after--h3">Streaming can empower the scalability of the entire system design.</p><p name="958f" id="958f" class="graf graf--p graf-after--p">Whether it’s through database CDC or events from microservices, it can effectively improve system availability and decouple business logic from data. That’s why I’ve been sharing the streaming architecture for the last few weeks.</p><p name="9164" id="9164" class="graf graf--p graf-after--p">This time we experienced the convenience of streaming through the managed platform provided by AWS, a fully automated archiving system. Without the help of streaming, we would have to find a way to activate some scheduled mechanisms, such as a crontab, and get up once a day to check what audit logs needs to be moved, and to do large-scale data migration.</p><p name="e71b" id="e71b" class="graf graf--p graf-after--p">If we use such a batch design, we will immediately encounter a problem, lack of real time. When we do data migration through periodic tasks, there is a data lag, for example, one day. Any data analysis performed on S3 will not get immediate results, but rather a snapshot of some point in time in the past, which is the biggest problem with batching.</p><p name="9690" id="9690" class="graf graf--p graf-after--p graf--trailing">But we haven’t actually introduced some of the famous streaming framework yet, so maybe we’ll have a chance to do that in the future, but rather than actually operating streaming, I feel I’d share some more topics related to architecture and system design.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/9537f793d5a8"><time class="dt-published" datetime="2022-09-19T01:28:50.704Z">September 19, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/archiving-mongodb-changes-to-aws-s3-9537f793d5a8" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

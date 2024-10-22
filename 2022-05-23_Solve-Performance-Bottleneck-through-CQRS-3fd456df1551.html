@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Solve Performance Bottleneck through CQRS</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Solve Performance Bottleneck through CQRS</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Explain how CQRS can help solve performance problems in detail
+</section>
+<section data-field="body" class="e-content">
+<section name="68da" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="329d" id="329d" class="graf graf--h3 graf--leading graf--title">Solve Performance Bottleneck through CQRS</h3><figure name="3824" id="3824" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*Fkg22FyCFBiCeDPp.png" data-width="1664" data-height="1264" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*Fkg22FyCFBiCeDPp.png"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@hannahjoshua" data-href="https://unsplash.com/@hannahjoshua" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Hannah Joshua</a> on <a href="https://unsplash.com/photos/46T6nVjRc2w" data-href="https://unsplash.com/photos/46T6nVjRc2w" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="c5e7" id="c5e7" class="graf graf--p graf-after--figure">Previously, I have introduce how to <a href="https://medium.com/interviewnoodle/shift-from-monolith-to-cqrs-a34bab75617e" data-href="https://medium.com/interviewnoodle/shift-from-monolith-to-cqrs-a34bab75617e" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">shift from a monolith to CQRS</a> in order to solve some problems. As the architecture gets bigger, the maintenance effort gets higher, so it is necessary to split the monolith into several execution units to reduce the development difficulty.</p><p name="c127" id="c127" class="graf graf--p graf-after--p">However, CQRS can be used in much more than that. In this article, we will introduce another pattern where CQRS can be applied, and this is the approach I use most often when solving performance bottlenecks.</p><h3 name="93a6" id="93a6" class="graf graf--h3 graf-after--p">Many-to-One Data Model</h3><p name="9350" id="9350" class="graf graf--p graf-after--h3">According to my previous introduction, we know CQRS can convert domain objects into several read models in order to extend functional requirements. Such a pattern is what I call a one-to-many transformation. From a single data source, various models for presentation are converted based on business logic.</p><p name="a8d6" id="a8d6" class="graf graf--p graf-after--p">But sometimes we need many-to-one transformation, and this usually results in performance bottlenecks.</p><p name="7215" id="7215" class="graf graf--p graf-after--p">Let’s take an e-commerce website as an example. Suppose we call only one API to pull back all the data when we open the homepage of the site.</p><blockquote name="65d7" id="65d7" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">/api/eshop/home</em></blockquote><p name="25e6" id="25e6" class="graf graf--p graf-after--blockquote">The purpose is to reduce the complexity of frontend development by having a single API for a single page, so that frontend developers can focus on rich presentation rather than data collection. This is common in small organizations or startups, in order to quickly produce publishable screens and simplify the communication process with the backend as much as possible.</p><p name="d6ac" id="d6ac" class="graf graf--p graf-after--p">Continuing with our example, this homepage API would require order information, user information, recommendation lists, inventory categories, and so on. Whether these data come from microservices or different data stores, they face the problem that their load is different. The data sources with high load will cause higher latency.</p><figure name="b7cf" id="b7cf" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*Ltt6SPlzWypgTCDTA__qiQ.png" data-width="666" data-height="678" src="https://cdn-images-1.medium.com/max/800/1*Ltt6SPlzWypgTCDTA__qiQ.png"></figure><p name="d2e0" id="d2e0" class="graf graf--p graf-after--figure">According to the above diagram, the order is the most heavily loaded, so the response time is the longest, up to one second. In this case there is a “long-tail effect”, even if some data sources respond quickly, the entire home API time depends on the most heavily loaded data source. In this example, it is one second.</p><h3 name="16b0" id="16b0" class="graf graf--h3 graf-after--p">Start System Evolution</h3><p name="8303" id="8303" class="graf graf--p graf-after--h3">To solve the long-tail effect, we can pre-build the homepage data in an independent data source, in other words, the homepage API does not need to take time to collect the desired data from everywhere, just obtain all the desired data from a single place. Ideally, the data would already be assembled.</p><p name="16c1" id="16c1" class="graf graf--p graf-after--p">So the system will look like this.</p><figure name="8d19" id="8d19" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*aqx0kCgiu2eOccYdu4VTVw.png" data-width="594" data-height="130" src="https://cdn-images-1.medium.com/max/800/1*aqx0kCgiu2eOccYdu4VTVw.png"></figure><p name="a0f1" id="a0f1" class="graf graf--p graf-after--figure">This has the additional benefit of eliminating the time spent assembling and collating data, and the efficiency of a single data source, which can significantly reduce latency.</p><p name="3b08" id="3b08" class="graf graf--p graf-after--p">Nevertheless, the issue remains. Since this is a pre-built data source, who is responsible for updating it?</p><figure name="d967" id="d967" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*ZVE5zDfEvGVJj15MDQH3SA.png" data-width="692" data-height="450" src="https://cdn-images-1.medium.com/max/800/1*ZVE5zDfEvGVJj15MDQH3SA.png"></figure><p name="1acd" id="1acd" class="graf graf--p graf-after--figure">The most intuitive approach is that whatever domain service the user is operating, that domain service will update it. In the above example, when a user modifies order data, the order service not only modifies the original database, but also modifies the new database. The same will happen to other domain services.</p><p name="f15e" id="f15e" class="graf graf--p graf-after--p">Remember the problem we were trying to solve at the beginning? When operating on a busy system, the response time is obviously slow.</p><p name="1d84" id="1d84" class="graf graf--p graf-after--p">Since it’s a busy system, such a change is like pushing a new problem onto someone who is already busy. We all know that database modifications are complex and time-consuming.</p><h3 name="42a7" id="42a7" class="graf graf--h3 graf-after--p">Evolve into CQRS</h3><p name="525e" id="525e" class="graf graf--p graf-after--h3">Therefore, what we expect is when users are operating the original domain service, someone can help us to synchronize the new database in the background without much domain service effort.</p><figure name="bf9a" id="bf9a" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*RMCio_D2K4lg1I3E9FoI4w.png" data-width="1184" data-height="194" src="https://cdn-images-1.medium.com/max/800/1*RMCio_D2K4lg1I3E9FoI4w.png"></figure><p name="ef22" id="ef22" class="graf graf--p graf-after--figure">The final architecture will be similar to this. Basically, this is the pattern of CQRS.</p><p name="9a36" id="9a36" class="graf graf--p graf-after--p">According to the previous article, there are three ways to implement the eventual consistency of CQRS, depending on how immediately the new database must be updated. The following is the order from fast to slow, but the implementation details will not be described in this article.</p><ol class="postList"><li name="e2ba" id="e2ba" class="graf graf--li graf-after--p">Background thread</li><li name="9bb1" id="9bb1" class="graf graf--li graf-after--li">Message queue plus workers</li><li name="91e1" id="91e1" class="graf graf--li graf-after--li">ETL</li></ol><p name="137b" id="137b" class="graf graf--p graf-after--li">Finally, we solve the original problem we were trying to solve: long-tail effects. Not only do we not create too much overhead for the original domain services, but we also don’t introduce too much coupling.</p><h3 name="afed" id="afed" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="e919" id="e919" class="graf graf--p graf-after--h3">You may ask, “Why not just write all the domain objects to a new database, HomeSource, instead of having a domain database (e.g. OrderSource) at the beginning? A typical example of such a practice is the Service Oriented Architecture.</p><p name="2e95" id="2e95" class="graf graf--p graf-after--p">If we do this, the problem is no longer the long-tail effect, but how to do the horizontal scaling of HomeSource. In the final architecture, most of the order functions are still done on the original data store, and only the data that needs to be presented on the homepage is transferred to the new data store in an asynchronous way.</p><p name="3202" id="3202" class="graf graf--p graf-after--p">If the data storage of all domain services is unified, the new unified data storage will be under more loading than the sum of the original domain storage. This requires more care and effort in database design, and creates a lot of data-level coupling. This is the main reason why the service-oriented architecture is becoming obsolete.</p><p name="e01a" id="e01a" class="graf graf--p graf-after--p">So far we have seen two scenarios of CQRS.</p><ol class="postList"><li name="01e8" id="01e8" class="graf graf--li graf-after--p">Improving productivity for extended functional requirements.</li><li name="6839" id="6839" class="graf graf--li graf-after--li">Solving performance bottlenecks.</li></ol><p name="aaa8" id="aaa8" class="graf graf--p graf-after--li graf--trailing">In fact, CQRS only provides a methodology and does not limit the situations in which it can be applied. Perhaps there is a pattern around you that would be a good fit for a CQRS solution, please feel free to share it with me.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/3fd456df1551"><time class="dt-published" datetime="2022-05-23T01:20:56.549Z">May 23, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/solve-performance-bottleneck-through-cqrs-3fd456df1551" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

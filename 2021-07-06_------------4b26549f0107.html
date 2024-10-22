@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>設計一個自動補完的後端</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">設計一個自動補完的後端</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+問題描述
+</section>
+<section data-field="body" class="e-content">
+<section name="769d" class="section section--body section--first"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="7b02" id="7b02" class="graf graf--h3 graf--leading graf--title">設計一個自動補完的後端</h3><h3 name="3ab2" id="3ab2" class="graf graf--h3 graf-after--h3">問題描述</h3><p name="7ce4" id="7ce4" class="graf graf--p graf-after--h3">設計一個能夠自動補完的後端系統，就像Google或亞馬遜</p><h3 name="ec2f" id="ec2f" class="graf graf--h3 graf-after--p">設計目的</h3><p name="3a9f" id="3a9f" class="graf graf--p graf-after--h3">像往常一樣，我們首先須要讓設計目標更加明確。花兩分鐘問自己這些問題：</p><ul class="postList"><li name="bd0c" id="bd0c" class="graf graf--li graf-after--p">這個系統需要處理多大的查詢數量(以秒計)？</li><li name="b956" id="b956" class="graf graf--li graf-after--li">期待的延遲？</li><li name="7eda" id="7eda" class="graf graf--li graf-after--li">這些查詢的文本是無邊界的嗎(像是Google)？或是有一些事先定義好的種類(像是亞馬遜的商品建議)？</li><li name="db2b" id="db2b" class="graf graf--li graf-after--li">我們想要怎樣顯示這些補全的建議？</li><li name="f3bd" id="f3bd" class="graf graf--li graf-after--li">其他</li></ul><p name="b209" id="b209" class="graf graf--p graf-after--li">這些問題的答案會引導整個設計的選擇，例如：</p><ul class="postList"><li name="5ac1" id="5ac1" class="graf graf--li graf-after--p">如果這個系統是為了一個熱門網站設計的，那麼查詢次數很可能每秒超過100K。這在現實生活中已經是非常大的量了，這個數字告訴我們兩件事：</li></ul><ol class="postList"><li name="ee20" id="ee20" class="graf graf--li graf-after--li">這個系統要能夠擴容到支援100K次的查詢，這不是單一台機器能夠承受的量。</li><li name="b37c" id="b37c" class="graf graf--li graf-after--li">系統需要消化這100K的查詢以便更新整個自動補全的結果，這通常可以透過非同步的方式處理。</li></ol><ul class="postList"><li name="811c" id="811c" class="graf graf--li graf-after--li">自動補全系統通常對於延遲很敏感，也就是說我們期待他的P95延遲在10ms。這個數字表示我們不必要把所有的資料的快取在記憶體，無論是跨資料中心的網路呼叫或使用SSD的隨機存取都是幾個ms的等級。但是，我們應該盡量多使用記憶體來減少延遲和資料庫的負載。一個小提醒，如果使用的是<em class="markup--em markup--li-em">關係型資料庫</em>例如MySQL，那必須要使用足夠好的機器等級，以<em class="markup--em markup--li-em">AWS RDS</em>來說，需要使用<code class="markup--code markup--li-code">db.r4.8xlarge</code>並且搭配幾個讀取複本來處理每秒100K的查詢。</li><li name="0430" id="0430" class="graf graf--li graf-after--li">假設我們要處理的是純文本輸入像是Google的自動補完，那表示字彙量很可能會很大。</li><li name="7e3d" id="7e3d" class="graf graf--li graf-after--li">如果當使用者輸入1到M個字元而我們要顯示最熱門的N個推薦，那麼N和M的值會決定整個設計走向。舉例來說，當<code class="markup--code markup--li-code">N = M = 5</code>，如果我們決定預先計算所有推薦，那我們只需要使用(26 + 262 + 263 + 264 + 265) * 5 * <code class="markup--code markup--li-code">avg_len_of_word</code>的空間，約小於0.5GB，這樣的使用量可以輕鬆被保存在記憶體中。另一方面，當<code class="markup--code markup--li-code">N = M = 10</code>，這就需要超過1K TB的空間，這也就是說我們需要很多機器來將這些資料保存在記憶體。</li></ul><h3 name="e3e2" id="e3e2" class="graf graf--h3 graf-after--li">作法</h3><p name="c295" id="c295" class="graf graf--p graf-after--h3">其中一種可行的架構看起來會像：</p><figure name="64a6" id="64a6" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*bKV98GAVXE5uCjWO.png" data-width="700" data-height="393" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*bKV98GAVXE5uCjWO.png"><figcaption class="imageCaption">architecture</figcaption></figure><h4 name="e3b2" id="e3b2" class="graf graf--h4 graf-after--figure">K-V pairs</h4><p name="d68e" id="d68e" class="graf graf--p graf-after--h4">因為有延遲限制的前提，所以動態產生推薦清單不太實際。我們需要預先計算結果，並將其用鍵值對的方式儲存起來；鍵是使用者輸入的前綴，而值是最熱門的推薦清單。例如：<code class="markup--code markup--p-code">(&quot;mic&quot;, [&quot;michael jordan&quot;, &quot;microsoft&quot;])</code>，這表示當前綴是mic的時候，有兩個最熱門的推薦：michael jordan和microsoft。選用鍵值對而不是其他更省空間的作法，如<a href="https://en.wikipedia.org/wiki/Trie" data-href="https://en.wikipedia.org/wiki/Trie" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Trie</a>的理由是，鍵值對更方便保存/利用。</p><h4 name="0943" id="0943" class="graf graf--h4 graf-after--p">Search log</h4><p name="b481" id="b481" class="graf graf--p graf-after--h4">搜尋記錄保留使用者產生的原始資料，這些資料來源是可信任的，之後會被用來計算鍵值對。用上述的例子，如果使用者輸入mic，並且使用者最後要的結果是microsoft，這表示另一個使用者輸入mic也有可能是想要microsoft，這背後的演算法是<em class="markup--em markup--p-em">貝葉斯推斷(Bayesian inference)</em>。</p><h4 name="d919" id="d919" class="graf graf--h4 graf-after--p">Offline Job</h4><p name="867e" id="867e" class="graf graf--p graf-after--h4">我們需要一個背景任務來將搜尋記錄轉換成鍵值對，這通常是運行一個<code class="markup--code markup--p-code">map-reduce</code>形式的批次處理任務。接著我們將產生的鍵值對推送到一個分散式存儲，例如：Redis或HBase；我們也需要將鍵值對推送到前方的伺服器來更新他們的快取。實務上，我們可以透過<code class="markup--code markup--p-code">MQ</code>如Kafka來可靠的推送結果。我們需要直接更新伺服器的理由是，這樣可以減少熱門資量在資料庫上的負載。</p><h4 name="b217" id="b217" class="graf graf--h4 graf-after--p">Servers</h4><p name="37de" id="37de" class="graf graf--p graf-after--h4">這些伺服器負責快取那些預先計算的結果和處理所有來自使用者的查詢。當輸入的字段沒有命中自己的本地快取，伺服器就查詢後端的分散式鍵值存儲。如果資料量超過一台機器的記憶體所能承受，我們就需要透過雜湊的方式將那些前綴分片在不同機器上，並且，為了能兼顧擴容，我們需要像下圖般維護複本；這個設計很常見也與其他設計問題相似。你可以在我其他文章內找到更多關於分片/複本的介紹。</p><figure name="c7ad" id="c7ad" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*l1_QxkqKPZW51ri7.png" data-width="700" data-height="339" src="https://cdn-images-1.medium.com/max/800/0*l1_QxkqKPZW51ri7.png"><figcaption class="imageCaption">server partition and replication</figcaption></figure><p name="90e7" id="90e7" class="graf graf--p graf-after--figure">在上圖中，我們使用第一個字母來做分片(這可能導致分片不平衡)。我們儲存所有首字母是a的鍵值對在節點一和節點二，首字母是b的放在節點二和三，而首字母是c的則是放在節點一和三，並且我們將這些資訊放在一個註冊表中。實務上，這個註冊表可以放在支援<code class="markup--code markup--p-code">Paxos-like</code>協定的任何伺服器群集(包含<code class="markup--code markup--p-code">Zab</code>和<code class="markup--code markup--p-code">Raft</code>)。路由層隱藏所有資料分片的複雜度；首先讀取/快取註冊表，接著透過輪詢的方式發送請求到對應節點，例如：將a開頭的搜尋關鍵字依序送到節點一和二。</p><h4 name="a622" id="a622" class="graf graf--h4 graf-after--p">個人化資料</h4><p name="f922" id="f922" class="graf graf--p graf-after--h4">在這個架構中，我們並沒有處理個人化資料。如果使用者在Google中搜尋，搜尋結果可能會參考個人興趣，這可以透過結合過去的搜尋歷史來產生。</p><h4 name="947b" id="947b" class="graf graf--h4 graf-after--p">CDN</h4><p name="4f0d" id="4f0d" class="graf graf--p graf-after--h4 graf--trailing">另一個設計選擇是，我們通常會導入CDN來減少延遲。我在這篇文章先忽略這個討論，你可以參考另一篇<a href="https://www.imperva.com/learn/performance/what-is-cdn-how-it-works/?utm_campaign=Incapsula-moved" data-href="https://www.imperva.com/learn/performance/what-is-cdn-how-it-works/?utm_campaign=Incapsula-moved" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">文章</a>來了解為什麼需要CDN。</p></div></div></section><section name="5795" class="section section--body section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><p name="d785" id="d785" class="graf graf--p graf--leading graf--trailing">作者：<a href="https://medium.com/@morefree7" data-href="https://medium.com/@morefree7" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">KKXX</a><br>文章出處：<a href="https://medium.com/@morefree7/design-the-auto-complete-type-ahead-backend-dc7ec56dc1df" data-href="https://medium.com/@morefree7/design-the-auto-complete-type-ahead-backend-dc7ec56dc1df" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">https://medium.com/@morefree7/design-the-auto-complete-type-ahead-backend-dc7ec56dc1df</a><br>譯者：我</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/4b26549f0107"><time class="dt-published" datetime="2021-07-06T13:37:36.998Z">July 6, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/%E8%A8%AD%E8%A8%88%E4%B8%80%E5%80%8B%E8%87%AA%E5%8B%95%E8%A3%9C%E5%AE%8C%E7%9A%84%E5%BE%8C%E7%AB%AF-4b26549f0107" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

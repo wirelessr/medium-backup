@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Solve Phantom Read in MySQL</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Solve Phantom Read in MySQL</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+A solution for write skew when “creating” data
+</section>
+<section data-field="body" class="e-content">
+<section name="3acf" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="5c69" id="5c69" class="graf graf--h3 graf--leading graf--title">Solve Phantom Read in MySQL</h3><h4 name="70ef" id="70ef" class="graf graf--h4 graf-after--h3 graf--subtitle">A solution for write skew when “creating” data</h4><figure name="6263" id="6263" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*Nkj3KriyNGjlu0aO.jpg" data-width="2600" data-height="1950" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*Nkj3KriyNGjlu0aO.jpg"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@tofi" data-href="https://unsplash.com/@tofi" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Tobias Fischer</a> on <a href="https://unsplash.com/photos/PkbZahEG2Ng" data-href="https://unsplash.com/photos/PkbZahEG2Ng" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="698c" id="698c" class="graf graf--p graf-after--figure">The combination of MySQL and its storage engine InnoDB is almost the most widely used relational database nowadays, and <em class="markup--em markup--p-em">Repeatable Read</em> is the most common in the isolation level.</p><p name="b69a" id="b69a" class="graf graf--p graf-after--p">However, compared to PostgreSQL, InnoDB has several problems that cannot be solved elegantly at the <em class="markup--em markup--p-em">Repeatable Read</em> level.</p><ol class="postList"><li name="8fd7" id="8fd7" class="graf graf--li graf-after--p">Lost updates</li><li name="eb64" id="eb64" class="graf graf--li graf-after--li">Phantom read</li></ol><p name="91ca" id="91ca" class="graf graf--p graf-after--li">Lost updates in PostgreSQL can be completely solved without additional hacks. As for phantom reads, there are some small tricks that can be used, such as <code class="markup--code markup--p-code">range types</code> and other mechanisms.</p><p name="cc49" id="cc49" class="graf graf--p graf-after--p">Nevertheless, MySQL still has to be careful to identify the pitfalls and deal with them properly by developers to solve such problems. In <a href="https://medium.com/interviewnoodle/how-to-avoid-the-race-condition-and-the-negative-value-3f397b2b08e4" data-href="https://medium.com/interviewnoodle/how-to-avoid-the-race-condition-and-the-negative-value-3f397b2b08e4" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">my previous article</a>, we introduced three ways to address lost updates. Those approaches provide a more flexible solution to lost updates and are suitable for a variety of scenarios.</p><p name="8bf8" id="8bf8" class="graf graf--p graf-after--p">In this article, we will further explore how to properly solve the write skew caused by phantom reads.</p><p name="46fb" id="46fb" class="graf graf--p graf-after--p">There are many types of scenes that result in phantom reads, but in general, they all have the following pattern.</p><ol class="postList"><li name="cd77" id="cd77" class="graf graf--li graf-after--p">Search a specific range.</li><li name="5d25" id="5d25" class="graf graf--li graf-after--li">Do something according to the results of the range (Create, Update, Delete).</li><li name="6c7d" id="6c7d" class="graf graf--li graf-after--li">The operation will directly affect the original range results.</li></ol><p name="437b" id="437b" class="graf graf--p graf-after--li">Suppose it is only an update or a delete, the most straightforward way to avoid write skew is to use an exclusive lock. If you use <code class="markup--code markup--p-code">FOR UPDATE</code> at the beginning of <code class="markup--code markup--p-code">SELECT</code>, then two concurrent transactions will be forced to go one after the other, thus effectively avoiding the write skew in the race condition.</p><p name="464c" id="464c" class="graf graf--p graf-after--p">However, in the case of a create, the solution is not so intuitive. Because there is no corresponding row to lock in <code class="markup--code markup--p-code">SELECT</code>, the row is created later. So how to solve it?</p><h3 name="af53" id="af53" class="graf graf--h3 graf-after--p">Meeting Room Booking System</h3><p name="0654" id="0654" class="graf graf--p graf-after--h3">Before introducing the solution, let’s use a practical example to describe the problem caused by phantom read.</p><p name="fdce" id="fdce" class="graf graf--p graf-after--p">There is a meeting room system that provides users to reserve a meeting room, and when the user has successfully reserved the meeting room, a new corresponding data will be added in the table as follows.</p><figure name="357e" id="357e" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*l3NXQNYuGh7HHswTCHOWfw.png" data-width="998" data-height="180" src="https://cdn-images-1.medium.com/max/800/1*l3NXQNYuGh7HHswTCHOWfw.png"><figcaption class="imageCaption">booking</figcaption></figure><p name="32b1" id="32b1" class="graf graf--p graf-after--figure">The above table records that user <code class="markup--code markup--p-code">A</code> reserved the meeting room <code class="markup--code markup--p-code">123</code> for one hour on 5/1 at 10 am.</p><p name="2531" id="2531" class="graf graf--p graf-after--p">The behavior of this system will be similar to the following pseudo-code.</p><pre name="54c3" id="54c3" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">count = `SELECT COUNT(*) FROM booking <br>         WHERE room_id = 123 AND <br>         start_time &lt; &#39;2022-05-01 11:00&#39; AND <br>         end_time &gt; &#39;2022-05-01 10:00&#39;`<br>         <br>if count == 0:<br>    `INSERT INTO booking (user, room_id, start_time, end_time)<br>     VALUES (&#39;A&#39;, 123, &#39;2022-05-01 10:00&#39;, &#39;2022-05-01 11:00&#39;)`</code></pre><p name="6421" id="6421" class="graf graf--p graf-after--pre">When the user is sure that the meeting room is unoccupied for the corresponding time slot, then the user can insert an entry as a reservation and the next user will not have a time conflict. Doesn’t that seem nice?</p><p name="90a4" id="90a4" class="graf graf--p graf-after--p">The problem occurs when two users want to occupy the same time slot in the same meeting room simultaneously, and they can both pass the first <code class="markup--code markup--p-code">SELECT</code> validation, so they can both insert a reservation, and a conflict occurs. And such a situation can not be solved by adding a lock, because there is no row to lock at the beginning.</p><h3 name="ad2f" id="ad2f" class="graf graf--h3 graf-after--p">Solve by Uniqueness (Incomplete Solution)</h3><p name="e253" id="e253" class="graf graf--p graf-after--h3">Since there is no way to turn a simultaneous operation into a sequential operation through a lock, we let one of them simply fail. To do so we need to add some constraints, e.g. unique constraints, to the table.</p><p name="88a2" id="88a2" class="graf graf--p graf-after--p">One approach is to create a unique constraint index on the room_id, start_time columns, so that the second person trying to reserve the same time slot will fail.</p><blockquote name="3004" id="3004" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">The problem is solved if we restrict the use of each room to a maximum of one hour.</em></blockquote><p name="ad5e" id="ad5e" class="graf graf--p graf-after--blockquote">But if the meeting room can be booked for more than an hour, another problem arises.</p><ol class="postList"><li name="d172" id="d172" class="graf graf--li graf-after--p">User A is reserved for 5/1 from 10am to 12pm</li><li name="1577" id="1577" class="graf graf--li graf-after--li">User B is reserved for 5/1 from 11:00 to 12:00</li></ol><p name="9d8e" id="9d8e" class="graf graf--p graf-after--li">When both User A and B are operating at the same time, this unique constraint obviously cannot be effective, and then the conflict around the meeting room remains.</p><h3 name="410f" id="410f" class="graf graf--h3 graf-after--p">Materialize Conflicts (Correct Solution)</h3><p name="02e1" id="02e1" class="graf graf--p graf-after--h3">To solve such phantom reads, the developer must use some tricks to reveal conflicts hidden under the same table.</p><p name="4ef1" id="4ef1" class="graf graf--p graf-after--p">One way is to create a new table and pre-fill it with data to act as a coordinator for simultaneous operations. In the case of this meeting room system, we can create a table <code class="markup--code markup--p-code">time_slots</code> that lists all time slots in advance as follows.</p><figure name="8be7" id="8be7" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*LcWy2cRfEA9gzfKpE6DkWA.png" data-width="686" data-height="406" src="https://cdn-images-1.medium.com/max/800/1*LcWy2cRfEA9gzfKpE6DkWA.png"><figcaption class="imageCaption">time_slots</figcaption></figure><p name="d5dc" id="d5dc" class="graf graf--p graf-after--figure">When the meeting room is to be reserved, we not only execute <code class="markup--code markup--p-code">SELECT</code> on the original <code class="markup--code markup--p-code">booking</code>, but also <code class="markup--code markup--p-code">SELECT</code> on <code class="markup--code markup--p-code">time_slots</code>, and we can add <code class="markup--code markup--p-code">FOR UPDATE</code> because the data already exists. It is worth noting that the new <code class="markup--code markup--p-code">SELECT FOR UPDATE</code> is executed before the original <code class="markup--code markup--p-code">SELECT</code>.</p><p name="1827" id="1827" class="graf graf--p graf-after--p">In that case, when the expected time slots of two simultaneous users overlap, they will be blocked by the exclusive lock and become one after the other, and the latter will fail directly because it sees the result of the previous completion.</p><h3 name="8c91" id="8c91" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="0070" id="0070" class="graf graf--p graf-after--h3">I have to say such a solution is difficult and not intuitive. However, in order not to sacrifice performance when using MySQL, the isolation level is not configured to be <em class="markup--em markup--p-em">Serializable</em>, which means complexity must be traded off for performance during execution.</p><p name="d1e5" id="d1e5" class="graf graf--p graf-after--p">It is a trade-off between complexity and performance. In fact, using <code class="markup--code markup--p-code">FOR UPDATE</code> to process synchronization in such a scenario does affect performance, and if <code class="markup--code markup--p-code">booking</code> is a table that may have phantom reads in all contexts, then making <code class="markup--code markup--p-code">booking</code> individually <em class="markup--em markup--p-em">Serializable</em> is a feasible solution.</p><p name="a96a" id="a96a" class="graf graf--p graf-after--p">When using a database, we must know the capabilities of the database and understand all the unsolvable situations of the database, so that we can know what kind of behaviors are potential risks when designing and developing.</p><p name="04f8" id="04f8" class="graf graf--p graf-after--p">In addition, how to properly address the risks is also an important topic. Although the use cases are not exactly the same for everyone, the patterns are similar, and learning how to solve each pattern will help you to deal with similar situations quickly in the future.</p><p name="5041" id="5041" class="graf graf--p graf-after--p graf--trailing">This article provides a solution for write skew when “creating” data, while the previous article is about solving write skew when “updating” data. These should cover most of the situations that you might encounter. If anyone has encountered other kinds of MySQL race conditions, please feel free to discuss them with me as well.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/a1c85f9a8c56"><time class="dt-published" datetime="2022-05-09T01:14:07.064Z">May 9, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/solve-phantom-read-in-mysql-a1c85f9a8c56" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

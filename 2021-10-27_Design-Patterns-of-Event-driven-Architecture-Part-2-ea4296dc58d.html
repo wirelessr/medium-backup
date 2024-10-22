@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Design Patterns of Event-driven Architecture Part 2</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Design Patterns of Event-driven Architecture Part 2</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Design patterns about how to handle synchronized communication in an event-driven architecture, and how to handle the event priority…
+</section>
+<section data-field="body" class="e-content">
+<section name="e046" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="09d1" id="09d1" class="graf graf--h3 graf--leading graf--title">Design Patterns of Event-driven Architecture Part 2</h3><p name="326f" id="326f" class="graf graf--p graf-after--h3">In my previous <a href="https://lazypro.medium.com/design-patterns-of-event-driven-architecture-bf0121cfda7b" data-href="https://lazypro.medium.com/design-patterns-of-event-driven-architecture-bf0121cfda7b" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">article</a>, I have described some design patterns to build a scalable, robust, efficient, and fault-tolerant system. Today we will talk about some other methods to solve the problems when designing a event-driven architecture.</p><h3 name="cd8b" id="cd8b" class="graf graf--h3 graf-after--p">Request-response Model</h3><p name="c392" id="c392" class="graf graf--p graf-after--h3">Wait, we are designing an event-driven architecture which is asynchronous definitely. Why we are talking about the synchronous model here? In my opinion, the request-response models is very classic way to start up a project. We used to request a response through the restful APIs. This implementation can reduce the development effort and give a straightforward view. However, we don’t want to lose the flexibility of event-driven architectures. The solution is we implement a request-response models upon an event system.</p><p name="4682" id="4682" class="graf graf--p graf-after--p">The sequential diagram is shown as the following figure 1.</p><figure name="e2cd" id="e2cd" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*EZiMbhWbAO583MWDJCUk3w.png" data-width="1200" data-height="694" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*EZiMbhWbAO583MWDJCUk3w.png"><figcaption class="imageCaption">Figure 1: request and response</figcaption></figure><p name="cf2c" id="cf2c" class="graf graf--p graf-after--figure">The server is a traditional HTTP server with some synchronous Restful APIs, and the client requests the server as usual. Nevertheless, the server doesn’t handle this request directly; instead, he delegate this job to the event worker and wait for the response at the agreed place which is another queue. After using this pattern, we can enjoy not only the benefits of the event-driven architecture but also the simplicity between clients and servers.</p><h3 name="4a3d" id="4a3d" class="graf graf--h3 graf-after--p">Ambulance Pattern</h3><p name="c56d" id="c56d" class="graf graf--p graf-after--h3">The ambulance pattern is used to handle the message priority correctly. The simple design for an emergency event is always put this event to the head of a queue, so that workers can process those high-priority events Immediately. Well, this implementation has some drawbacks, especially, the starvation of the low-priority events. Those normal events might not be processed at all, because there are always emergency events come in.</p><p name="b2aa" id="b2aa" class="graf graf--p graf-after--p">In order to handle events evenly, we can separate emergency events from ordinary events and submit to a new queue like the follows:</p><figure name="4029" id="4029" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*PuCk73cPGKlktywA4cA98A.png" data-width="904" data-height="322" src="https://cdn-images-1.medium.com/max/800/1*PuCk73cPGKlktywA4cA98A.png"></figure><p name="b5de" id="b5de" class="graf graf--p graf-after--figure">The workers can pick events from those queues to avoid the starvation. There can be a weight to determine the ratio of the two sides, or simply use round-robin to handle those events sequentially.</p><p name="2633" id="2633" class="graf graf--p graf-after--p">Furthermore, you can dedicate a worker focus on the emergency events.</p><figure name="0d9a" id="0d9a" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*teBO7b55j7DEC82sMnGnSg.png" data-width="904" data-height="322" src="https://cdn-images-1.medium.com/max/800/1*teBO7b55j7DEC82sMnGnSg.png"></figure><h3 name="d289" id="d289" class="graf graf--h3 graf-after--figure">Conclusion</h3><p name="a73f" id="a73f" class="graf graf--p graf-after--h3">We have described two patterns to face some design decisions. In order to make the client more easily, we can leverage the request-response model. If we encounter a scenario is to distinguish the event priority, we can use the ambulance pattern.</p><p name="440c" id="440c" class="graf graf--p graf-after--p graf--trailing">The trend of using event-driven architecture has become apparent. However, until now, there is no one-size-fits-all solution can design a well architecture for events. We have to find the corresponding solution according to various situations. Hope these two articles are helpful to you.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/ea4296dc58d"><time class="dt-published" datetime="2021-10-27T03:12:13.992Z">October 27, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/design-patterns-of-event-driven-architecture-part-2-ea4296dc58d" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

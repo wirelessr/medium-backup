@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Understanding Partial Indexing</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Understanding Partial Indexing</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+When and how to use partial indexing
+</section>
+<section data-field="body" class="e-content">
+<section name="6c89" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="9f6c" id="9f6c" class="graf graf--h3 graf--leading graf--title">Understanding Partial Indexing</h3><h4 name="7a2f" id="7a2f" class="graf graf--h4 graf-after--h3 graf--subtitle">When and how to use partial indexing</h4><figure name="7507" id="7507" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*Qh8C7h4nVT3CTPZi.jpg" data-width="1772" data-height="1179" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*Qh8C7h4nVT3CTPZi.jpg"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@qwitka" data-href="https://unsplash.com/@qwitka" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Maksym Kaharlytskyi</a> on <a href="https://unsplash.com/photos/Q9y3LRuuxmg" data-href="https://unsplash.com/photos/Q9y3LRuuxmg" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="1500" id="1500" class="graf graf--p graf-after--figure">A few days ago, a team member asked me a question about partial indexing, and I feel it’s a good topic, so today we’ll talk about partial indexing:</p><ol class="postList"><li name="8713" id="8713" class="graf graf--li graf-after--p">What are the benefits of partial indexing?</li><li name="cdfe" id="cdfe" class="graf graf--li graf-after--li">When should I use a partial index?</li></ol><p name="f2b3" id="f2b3" class="graf graf--p graf-after--li">Before we talk about the above two questions, let’s have a basic understanding of partial indexing.</p><p name="0b4b" id="0b4b" class="graf graf--p graf-after--p">The purpose of database indexing is to speed up query performance by placing data in memory through special data structures in order to avoid long access latency on the hard drive.</p><p name="28f1" id="28f1" class="graf graf--p graf-after--p">The current mainstream RDBMS MySQL and PostgreSQL, they use B+ tree, while the document-based MongoDB uses B tree.</p><p name="7c8d" id="7c8d" class="graf graf--p graf-after--p">Most of the database indexes do not treat each row in the database as a separate leaf node, but use the “value” as the leaf and record the primary key in it, so after finding the leaf, it is necessary to pull the other data from the primary key.</p><p name="c319" id="c319" class="graf graf--p graf-after--p">Partial indexes only create nodes for “values” that meet certain conditions. Currently MongoDB and PostgreSQL both support partial indexes, but InnoDB, which is often used by MySQL, does not. After MySQL 8.0, there is support for functional indexes, which can be used to achieve the effect of partial indexes.</p><h3 name="a279" id="a279" class="graf graf--h3 graf-after--p">What are the benefits of partial indexing?</h3><p name="08eb" id="08eb" class="graf graf--p graf-after--h3">After understanding the background of partial indexing, it should be no wonder that the biggest advantage of partial indexing is to reduce the memory size occupied by the index. Compared to creating nodes for all values, partial indexing only creates nodes for some values, so the percentage of reduction depends on the criteria used.</p><p name="c332" id="c332" class="graf graf--p graf-after--p">For example, if I have a single-field (a) index with values from 0 to 9, I can save about 50% of the space overhead if I set the partial index condition to <code class="markup--code markup--p-code">a &gt;= 5</code>. Note that this is not related to the amount of data, but only to the value ranges. Even if the <code class="markup--code markup--p-code">a = 0</code> data has only one row, it will still have an index node as well as the <code class="markup--code markup--p-code">a = 1</code> data with 1000 rows.</p><p name="6f47" id="6f47" class="graf graf--p graf-after--p">In addition to saving space, the query performance will also be improved. The query efficiency of B tree is <code class="markup--code markup--p-code">O(log N)</code>, where <code class="markup--code markup--p-code">N</code> refers to the number of index nodes, not the number of rows.</p><p name="570a" id="570a" class="graf graf--p graf-after--p">After partial indexing, we can get a more compact tree, let’s say it has M nodes. Due to <code class="markup--code markup--p-code">M &lt; N</code>, so <code class="markup--code markup--p-code">O(log M) &lt; O(log N)</code>, we thus know that partial indexing can improve the query performance. However, the benefit is small, because after <code class="markup--code markup--p-code">log</code>, unless the difference between <code class="markup--code markup--p-code">N</code> and <code class="markup--code markup--p-code">M</code> is significant, the effect on query performance is not much.</p><p name="6fb8" id="6fb8" class="graf graf--p graf-after--p">To sum up, the biggest advantage of partial indexing is to reduce the space overhead for indexing and to improve some of the query performance.</p><h3 name="235c" id="235c" class="graf graf--h3 graf-after--p">When should I use a partial index?</h3><p name="aeab" id="aeab" class="graf graf--p graf-after--h3">To figure out the time to use it, we first need to know what will happen when the “query results” will contain nodes that don’t meet the partial indexing criteria.</p><p name="a0d9" id="a0d9" class="graf graf--p graf-after--p">A bit abstract, right? Let’s use MongoDB as an example.</p><p name="8291" id="8291" class="graf graf--p graf-after--p">First, there is a partial index built on a compound index of the user list, in order to make indexing adults faster.</p><pre name="d043" id="d043" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">db.users.createIndex(<br>   { name: 1 },<br>   { partialFilterExpression: { age: { $gte: 18 } } }<br>)</code></pre><p name="d8d6" id="d8d6" class="graf graf--p graf-after--pre">However, if our scenario is likely to require a query for a name without an age limit, then such a query will not use the index.</p><pre name="3561" id="3561" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">db.users.find({name: &quot;Tom&quot;})</code></pre><p name="98f3" id="98f3" class="graf graf--p graf-after--pre">For instance, if there are three Toms aged 8, 18 and 28, then <code class="markup--code markup--p-code">(&quot;Tom&quot;, 18)</code> and <code class="markup--code markup--p-code">(&quot;Tom&quot;, 28)</code> will both be created but not <code class="markup--code markup--p-code">(&quot;Tom&quot;, 8)</code>, so the MongoDB optimizer knows this is the case and will not use partial indexes, but will use full table scans instead.</p><p name="18a6" id="18a6" class="graf graf--p graf-after--p">Yes, that’s the price. As soon as the scenario contains a condition that is not in the value range of the partial index, then it becomes a full table scan.</p><p name="6a2f" id="6a2f" class="graf graf--p graf-after--p">Therefore, what kind of scenario is suitable for partial indexing? In my opinion, two conditions need to be satisfied.</p><ol class="postList"><li name="3921" id="3921" class="graf graf--li graf-after--p">The value range is large, but the common range of data is small.</li><li name="cf9a" id="cf9a" class="graf graf--li graf-after--li">Even without index, the query will not impact the database too much, e.g., query frequency, collection size, etc.</li></ol><p name="18ad" id="18ad" class="graf graf--p graf-after--li">The second point is simpler to understand, but what does the first point exactly mean?</p><p name="00de" id="00de" class="graf graf--p graf-after--p">From the previous section, we know the biggest advantage of partial indexing is to reduce the space of indexes rather than to improve the performance of queries, so the most effective scenario is when data is scattered and only a fraction of the common data is used by the application.</p><p name="5205" id="5205" class="graf graf--p graf-after--p">Take a practical example of a membership system.</p><p name="aa45" id="aa45" class="graf graf--p graf-after--p">From registration to membership, a user may need to go through many procedures until finally becoming a member after email verification. But this system, for non-members basically does not care, it only focuses on processing the verified member data.</p><p name="86e1" id="86e1" class="graf graf--p graf-after--p">Then, the partial index can be designed in this way.</p><pre name="560c" id="560c" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">db.users.createIndex(<br>   { name: 1 },<br>   { partialFilterExpression: { email: { $exists: true } } }<br>)</code></pre><p name="99bc" id="99bc" class="graf graf--p graf-after--pre">Because this membership system only cares about member information, i. e., users must have email. There may be a large number of users who go through the partial registration process at the beginning but do not pass the verification process at the end, then there will be a large amount of data that does not need to be indexed. In this way, the index space can be reduced as much as possible, and the efficiency of the member’s query can be improved.</p><h3 name="59c4" id="59c4" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="fe4f" id="fe4f" class="graf graf--p graf-after--h3">After all, there is not a perfect solution. Partial indexing saves index space and improves query performance, but there is a corresponding price to pay for a full table scan.</p><p name="4716" id="4716" class="graf graf--p graf-after--p">Therefore, it is important to understand the principle of partial indexing and the scenario of using it.</p><p name="95d3" id="95d3" class="graf graf--p graf-after--p graf--trailing">The effectiveness of an indexing mechanism depends entirely on the data distribution and the characteristics of the application, whether it is a regular index or a partial index. Therefore, this article can’t tell you a one size fits all solution, it can only offer you a guideline, and it’s up to you to take the trade-off.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/55d6f1e10c08"><time class="dt-published" datetime="2022-08-08T01:20:03.239Z">August 8, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/partial-indexing-faq-55d6f1e10c08" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

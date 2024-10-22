@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>When to Consider Design Patterns</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">When to Consider Design Patterns</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Balancing practicality and over-engineering in software development
+</section>
+<section data-field="body" class="e-content">
+<section name="fe96" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="93b4" id="93b4" class="graf graf--h3 graf--leading graf--title">When to Consider Design Patterns</h3><h4 name="4a77" id="4a77" class="graf graf--h4 graf-after--h3 graf--subtitle">Balancing practicality and over-engineering in software development</h4><figure name="966b" id="966b" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="1*AMROf0mlE-X7Zqd6tpfwSA.png" data-width="4032" data-height="2268" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*AMROf0mlE-X7Zqd6tpfwSA.png"><figcaption class="imageCaption">My girl</figcaption></figure><p name="cbfc" id="cbfc" class="graf graf--p graf-after--figure">This week, at the study group, our engineer asked a question: Should we follow the design pattern to design and implement the project from the beginning?</p><p name="7450" id="7450" class="graf graf--p graf-after--p">The design pattern mentioned here refers to GoF’s <code class="markup--code markup--p-code">Design Patterns</code>.</p><figure name="981f" id="981f" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*iNMvKrBpAzn0jPK2.png" data-width="502" data-height="634" src="https://cdn-images-1.medium.com/max/800/0*iNMvKrBpAzn0jPK2.png"></figure><p name="fe72" id="fe72" class="graf graf--p graf-after--figure">Meanwhile, there is a related context which suggests that our coding should follow <code class="markup--code markup--p-code">SOLID principle</code> as much as possible, especially the first S and the second O, anyway.</p><p name="f692" id="f692" class="graf graf--p graf-after--p">Since SOLID principle should be followed as much as possible, then the design pattern should also be taken into consideration from the very beginning, right?</p><p name="1fc9" id="1fc9" class="graf graf--p graf-after--p">No, not really.</p><h3 name="69a1" id="69a1" class="graf graf--h3 graf-after--p">What are design patterns?</h3><blockquote name="f4ab" id="f4ab" class="graf graf--blockquote graf-after--h3"><em class="markup--em markup--blockquote-em">The design patterns we often talk about actually refer to those solutions defined by GoF, which are designed to solve the problems often faced in object-oriented programming.</em></blockquote><blockquote name="2639" id="2639" class="graf graf--blockquote graf-after--blockquote"><em class="markup--em markup--blockquote-em">When we want the code to be easy to maintain and easy to modify, i.e., the open and closed principle, we abstract the problems through various encapsulation techniques, and eventually become those interesting design patterns.</em></blockquote><p name="7a82" id="7a82" class="graf graf--p graf-after--blockquote">Did you notice two key points in this paragraph?</p><ol class="postList"><li name="559d" id="559d" class="graf graf--li graf-after--p">OOP-specific problems</li><li name="f75d" id="f75d" class="graf graf--li graf-after--li">Ease of maintenance and modification</li></ol><p name="9c7e" id="9c7e" class="graf graf--p graf-after--li">If your project has just started and there is still a question mark over whether it will be successful or not, why do you need to think about the flexibility in the long term?</p><p name="c435" id="c435" class="graf graf--p graf-after--p">If your project requirements are fixed, why do you need to worry about maintenance and modification?</p><p name="fb49" id="fb49" class="graf graf--p graf-after--p">If you’re one of my regular readers, you’ll remember we’ve talked about a similar question before.</p><blockquote name="1319" id="1319" class="graf graf--blockquote graf-after--p"><a href="https://lazypro.medium.com/when-to-consider-clean-architecture-a-practical-guide-6a21fccb5e6b" data-href="https://lazypro.medium.com/when-to-consider-clean-architecture-a-practical-guide-6a21fccb5e6b" class="markup--anchor markup--blockquote-anchor" rel="noopener noreferrer noopener" target="_blank"><em class="markup--em markup--blockquote-em">When to consider clean architecture?</em></a></blockquote><p name="5415" id="5415" class="graf graf--p graf-after--blockquote">Even earlier on, we have talked about another similar issue.</p><blockquote name="3c0a" id="3c0a" class="graf graf--blockquote graf-after--p"><a href="https://interviewnoodle.com/do-you-really-need-a-microservice-91a48cbea8c1" data-href="https://interviewnoodle.com/do-you-really-need-a-microservice-91a48cbea8c1" class="markup--anchor markup--blockquote-anchor" rel="noopener noreferrer noopener" target="_blank"><em class="markup--em markup--blockquote-em">Do you really need a microservice?</em></a></blockquote><p name="93d0" id="93d0" class="graf graf--p graf-after--blockquote">Most of time, I’m on the side of “don’t over-engineering”.</p><p name="5060" id="5060" class="graf graf--p graf-after--p">Whether it’s design patterns, clean architecture, or even microservice architecture, they are all means to solve problems, but first, you have to encounter the problem. If you have a clear problem, find the right solution, and don’t do it just for the sake of doing it.</p><h3 name="5e13" id="5e13" class="graf graf--h3 graf-after--p">What exactly is a Pattern?</h3><p name="4e8d" id="4e8d" class="graf graf--p graf-after--h3">By the way, what is pattern?</p><p name="9f1a" id="9f1a" class="graf graf--p graf-after--p">As I mentioned at the beginning, the design patterns we often talk about actually refer to the solutions listed in the GoF book.</p><p name="11ec" id="11ec" class="graf graf--p graf-after--p">Pattern is like a “symptom”, when you have a cold over and over again, you will know that you need to drink more water and take more rest, the same is true when we program. When we see a certain problem over and over again, we will naturally have a corresponding solution, but will this solution be the most effective one?</p><p name="48e5" id="48e5" class="graf graf--p graf-after--p">The design pattern is the medicine for that symptom. When we come across a symptom, we will find out the corresponding medicine to solve the problem, and therefore, you should not usually take medicine without thinking about it, right? It’s unhealthy to take medicine when you don’t have symptoms.</p><p name="d787" id="d787" class="graf graf--p graf-after--p">In fact, patterns are everywhere.</p><p name="aa6b" id="aa6b" class="graf graf--p graf-after--p">Object-oriented programming has its patterns, software architecture has its patterns, and even system architecture has its patterns.</p><p name="8d70" id="8d70" class="graf graf--p graf-after--p">For example, the following book should not be unfamiliar to you.</p><figure name="e16c" id="e16c" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*E5DDIVAVxVUTZ0Fa.png" data-width="500" data-height="627" src="https://cdn-images-1.medium.com/max/800/0*E5DDIVAVxVUTZ0Fa.png"></figure><p name="41e3" id="41e3" class="graf graf--p graf-after--figure">This book may feel a little unfamiliar.</p><figure name="410e" id="410e" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*ZdKc7OfUv7vL705D.png" data-width="250" data-height="375" src="https://cdn-images-1.medium.com/max/800/0*ZdKc7OfUv7vL705D.png"></figure><p name="72a2" id="72a2" class="graf graf--p graf-after--figure">Here is a <a href="https://en.wikipedia.org/wiki/Pattern-Oriented_Software_Architecture" data-href="https://en.wikipedia.org/wiki/Pattern-Oriented_Software_Architecture" class="markup--anchor markup--p-anchor" rel="noopener noreferrer noopener" target="_blank">series of books</a> from Volume 1 to Volume 5.</p><figure name="0f29" id="0f29" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*LlkHCi-TI0vs5pzG.png" data-width="770" data-height="1000" src="https://cdn-images-1.medium.com/max/800/0*LlkHCi-TI0vs5pzG.png"></figure><p name="73bc" id="73bc" class="graf graf--p graf-after--figure">These books are all about the patterns encountered in various software development contexts, in short, a list of medicines.</p><p name="16ce" id="16ce" class="graf graf--p graf-after--p">If we’re sick, we can get something out of it, but if we’ve never been sick, we don’t even know what they’re talking about, not to mention when to consider the patterns.</p><h3 name="27aa" id="27aa" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="2fd9" id="2fd9" class="graf graf--p graf-after--h3">Software development is a pragmatic process.</p><p name="a754" id="a754" class="graf graf--p graf-after--p">What we are doing is always encountering problems, thinking about them, and finally solving them.</p><p name="20c5" id="20c5" class="graf graf--p graf--startsWithDoubleQuote graf-after--p">“This may be needed in the future, so I’m ready for it.” I’ve heard this phrase a lot, but in reality, most of these pre-prepared things don’t work. Because requirements are always changing.</p><p name="6938" id="6938" class="graf graf--p graf-after--p graf--trailing">But if we find requirements have changed and it’s hard for us to implement them, then it’s not too late to consider what medicine we need to take. This is refactoring.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/7d0507d1c429"><time class="dt-published" datetime="2024-08-05T01:44:05.015Z">August 5, 2024</time></a>.</p><p><a href="https://medium.com/@lazypro/when-to-consider-design-patterns-7d0507d1c429" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

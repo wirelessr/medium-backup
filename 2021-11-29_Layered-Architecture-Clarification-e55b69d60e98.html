@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Layered Architecture Clarification</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Layered Architecture Clarification</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Describe how to leverage layered architecture in a microservice and how to use layered architecture in a correct way.
+</section>
+<section data-field="body" class="e-content">
+<section name="0ef7" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="d15a" id="d15a" class="graf graf--h3 graf--leading graf--title">Layered Architecture Clarification</h3><figure name="b76e" id="b76e" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*aBdFCd2GP3xER_o3.jpg" data-width="601" data-height="534" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*aBdFCd2GP3xER_o3.jpg"><figcaption class="imageCaption">The layered model according to the clean architecture principle</figcaption></figure><p name="65a7" id="65a7" class="graf graf--p graf-after--figure">Layered architecture is a common pattern of an architecture design, and it is very suitable for a small scale monolith. There are many advantages such as,</p><ol class="postList"><li name="af01" id="af01" class="graf graf--li graf-after--p">very easy to design and implement</li><li name="8631" id="8631" class="graf graf--li graf-after--li">very in line with human nature</li><li name="95c7" id="95c7" class="graf graf--li graf-after--li">cooperate with each other more easily</li></ol><p name="3f4f" id="3f4f" class="graf graf--p graf-after--li">When we are talking about the layered architecture, we often have a myth; in order to replace the dependency, we should make those dependencies as a layer.</p><p name="4bab" id="4bab" class="graf graf--p graf-after--p">In fact, that’s not the purpose of layered architecture. I believe we seldom need to change a database, a framework, even a programming language. Therefore, what is the benefit of using layers?</p><p name="2787" id="2787" class="graf graf--p graf-after--p">Before we discuss further, we should see an example first.</p><figure name="725c" id="725c" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*n_CYh281E5t66-KHXYncxw.png" data-width="720" data-height="136" src="https://cdn-images-1.medium.com/max/800/1*n_CYh281E5t66-KHXYncxw.png"></figure><p name="25aa" id="25aa" class="graf graf--p graf-after--figure">The above diagram is a classic layered architecture for a web server. We separate a request flow into 4 components, route, controller, service and repository. Each component has its responsibility to handle a part of a request flow. This kind of implementation is also known as Single-Responsibility Principle.</p><p name="378e" id="378e" class="graf graf--p graf-after--p">In many articles, we had been taught that route is made for the web framework changed, and the repo is to nail the database. However, as I mentioned earlier, we seldom need change those hard things. Route and repo here are just completing their own duties.</p><h3 name="381c" id="381c" class="graf graf--h3 graf-after--p">Single-Responsibility Principle</h3><p name="4091" id="4091" class="graf graf--p graf-after--h3">I will describe those 4 components’ responsibilities to let you realize them more confidently.</p><ul class="postList"><li name="2754" id="2754" class="graf graf--li graf-after--p">Route is a the wrapper of a web framework. To interact with a framework and hide the implementation, we build a layer to enclose those details. In route layer, we usually define HTTP routes right here including HTTP methods and URI.</li><li name="0677" id="0677" class="graf graf--li graf-after--li">Controller is the first line to handle a request. The main responsibility is validating the input request and assembling the response. This layer often implements some error handlers to reflect like “400 Bad Request”, “500 Internal Server Error”, etc.</li><li name="c4c8" id="c4c8" class="graf graf--li graf-after--li">Service is where the business logic in. The core values of a web product are all here. If it is a E-commerce site, service will calculate the recommendation, orchestrate the render content, and all other logic.</li><li name="7396" id="7396" class="graf graf--li graf-after--li">Repo is an abstraction onto a database. In order to isolate the business logic, we don’t want the database operation to pollute the code in services, thus, repo plays this role in accessing persisted data.</li></ul><p name="fdb8" id="fdb8" class="graf graf--p graf-after--li">The text description is a bit abstract, so I provide a more concrete example: <a href="https://github.com/wirelessr/Clean-Architect-in-Golang" data-href="https://github.com/wirelessr/Clean-Architect-in-Golang" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">https://github.com/wirelessr/Clean-Architect-in-Golang</a></p><p name="1ece" id="1ece" class="graf graf--p graf-after--p">The GitHub repository is quite simple due to the screaming architecture, hence, we can know this is a classic web service.</p><ul class="postList"><li name="d754" id="d754" class="graf graf--li graf-after--p">Route is a mux wrapper in http. It will do nothing and route HTTP request to the controller.</li><li name="f5b1" id="f5b1" class="graf graf--li graf-after--li">Controller defines API interfaces. In <a href="https://github.com/wirelessr/Clean-Architect-in-Golang/blob/58c8e0738ff92a7363f73111523928b4c15a9762/controller/post-controller.go#L42" data-href="https://github.com/wirelessr/Clean-Architect-in-Golang/blob/58c8e0738ff92a7363f73111523928b4c15a9762/controller/post-controller.go#L42" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">AddPost</a>, it also validates the request format and assembles the response.</li><li name="3603" id="3603" class="graf graf--li graf-after--li">Service own all business logic including how to access durable data, what the post format is, and how to generate the post identifier.</li><li name="aba0" id="aba0" class="graf graf--li graf-after--li">Repo hides all database details, so you can choose what data store you want. But, again, we don’t change our data store decision easily. Therefore, repo here is to encapsulate the data store access to make service be independent from <code class="markup--code markup--li-code">firestore</code>.</li></ul><h3 name="7c52" id="7c52" class="graf graf--h3 graf-after--li">What’s Benefit</h3><p name="8389" id="8389" class="graf graf--p graf-after--h3">Do we just separate our web service into several layers for SRP? No. Actually, this comes some benefits. Let me show two most important advantages,</p><ol class="postList"><li name="ebef" id="ebef" class="graf graf--li graf-after--p">Layers make testing become more easily.</li><li name="9d96" id="9d96" class="graf graf--li graf-after--li">If those layers are modules, we can decouple the deployment of layer modules.</li></ol><p name="cf6d" id="cf6d" class="graf graf--p graf-after--li">The second one is straightforward. Thus, I will dive into the test. According to <a href="https://medium.com/interviewnoodle/whats-difference-between-unit-test-and-integration-test-aae6ef13220" data-href="https://medium.com/interviewnoodle/whats-difference-between-unit-test-and-integration-test-aae6ef13220" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">my previous article</a>, we can leverage the dependency injection to accomplish a high testing coverage. For instance, in <a href="https://github.com/wirelessr/Clean-Architect-in-Golang/blob/master/service/post-service_test.go" data-href="https://github.com/wirelessr/Clean-Architect-in-Golang/blob/master/service/post-service_test.go" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">my golang example</a>, in order to verify the service, we can create a mocked repo to ignore the data store access.</p><h3 name="cb8a" id="cb8a" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="79b0" id="79b0" class="graf graf--p graf-after--h3 graf--trailing">There are many articles trying to compare layered architecture and microservice architecture. However, layered architecture is not only an architecture pattern but also the coding technique for a SOLID software. This article tells you still can use layered architecture in your microservice like my post example. They are not two mutually exclusive things; moreover, they are more close to each other.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/e55b69d60e98"><time class="dt-published" datetime="2021-11-29T02:15:33.540Z">November 29, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/layered-architecture-clarification-e55b69d60e98" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

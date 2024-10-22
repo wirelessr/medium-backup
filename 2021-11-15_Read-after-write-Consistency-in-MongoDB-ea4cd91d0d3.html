@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Read-after-write Consistency in MongoDB</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Read-after-write Consistency in MongoDB</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+With default configuration, MongoDB is eventual consistency. I will describe how to achieve read-after-write consistency in MongoDB.
+</section>
+<section data-field="body" class="e-content">
+<section name="1492" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="745a" id="745a" class="graf graf--h3 graf--leading graf--title">Read-after-write Consistency in MongoDB</h3><p name="8154" id="8154" class="graf graf--p graf-after--h3">In this article, I will describe how to achieve read-after-write consistency in MongoDB. The problem what we want to solve is:</p><ul class="postList"><li name="a1f6" id="a1f6" class="graf graf--li graf-after--p">A collection maintains profiles.</li><li name="59a6" id="59a6" class="graf graf--li graf-after--li">After we insert a new profile, we want to retrieve the top 20 ordered by some criteria in the same function.</li><li name="0929" id="0929" class="graf graf--li graf-after--li">We find the newest profile is always not been found.</li></ul><p name="2d86" id="2d86" class="graf graf--p graf-after--li">Our MongoDB client’s configuration is almost default with a connection string, <code class="markup--code markup--p-code">readPreference=secondaryPreferred</code>.</p><h3 name="5744" id="5744" class="graf graf--h3 graf-after--p">Changing Read Preference (incorrect)</h3><p name="504f" id="504f" class="graf graf--p graf-after--h3">We want to make the query always comes from the primary, so we try to assign a session-level read preference to <code class="markup--code markup--p-code">primary</code>. The <a href="https://docs.mongodb.com/manual/reference/mongodb-defaults/" data-href="https://docs.mongodb.com/manual/reference/mongodb-defaults/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">official manual</a> shows the collection-level preference can overwrite the client-level one.</p><figure name="bb64" id="bb64" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*6UqpVNv2Sy7RSOiW.png" data-width="612" data-height="460" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*6UqpVNv2Sy7RSOiW.png"></figure><p name="911e" id="911e" class="graf graf--p graf-after--figure">However, it does not work.</p><h3 name="16a6" id="16a6" class="graf graf--h3 graf-after--p">Changing Read and Write Concern (solution)</h3><p name="a65e" id="a65e" class="graf graf--p graf-after--h3">After consulting the MongoDB solution architect, we find the default read concern is <code class="markup--code markup--p-code">local</code> which <a href="https://docs.mongodb.com/manual/reference/read-concern-local/#read-concern--local-" data-href="https://docs.mongodb.com/manual/reference/read-concern-local/#read-concern--local-" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">doesn’t guarantee the operation order</a>. Thus, the solution is not only changing the read concern to <code class="markup--code markup--p-code">majority</code> but also changing the write concern to <code class="markup--code markup--p-code">majority</code>.</p><p name="2320" id="2320" class="graf graf--p graf-after--p">Then, the problem is resolved.</p><p name="46da" id="46da" class="graf graf--p graf-after--p graf--trailing">By the way, the solution is a little complicated than MySQL does. If we use MySQL as one primary and two replicas, we can switch the read operation from a replica to the primary to ensure read-after-write consistency. On the other hand, MongoDB is designed to face the scene of large-volume data, he has to do more to balance the efficiency and functionality. Thus, in addition to configuring the read preference, using read concern and write concern are also essential.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/ea4cd91d0d3"><time class="dt-published" datetime="2021-11-15T02:46:57.455Z">November 15, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/read-after-write-consistency-in-mongodb-ea4cd91d0d3" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

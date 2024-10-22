@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Trino &amp; Iceberg Made Easy: A Ready-to-Use Playground</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Trino &amp; Iceberg Made Easy: A Ready-to-Use Playground</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+A quick-start environment for effortless exploration and learning
+</section>
+<section data-field="body" class="e-content">
+<section name="5795" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="589f" id="589f" class="graf graf--h3 graf--leading graf--title">Trino &amp; Iceberg Made Easy: A Ready-to-Use Playground</h3><h4 name="d837" id="d837" class="graf graf--h4 graf-after--h3 graf--subtitle">A quick-start environment for effortless exploration and learning</h4><figure name="ab3f" id="ab3f" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*N9x4AiBHMnLk8O3r" data-width="1000" data-height="563" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*N9x4AiBHMnLk8O3r"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@nicosmit99" data-href="https://unsplash.com/@nicosmit99" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Nico Smit</a> on <a href="https://unsplash.com/photos/green-and-blue-animal-cartoon-character-eMFw6fSF7sM" data-href="https://unsplash.com/photos/green-and-blue-animal-cartoon-character-eMFw6fSF7sM" class="markup--anchor markup--figure-anchor" rel="noopener" target="_blank">Unsplash</a></figcaption></figure><p name="c4ba" id="c4ba" class="graf graf--p graf-after--figure">Earlier I briefly <a href="https://medium.com/@lazypro/getting-started-with-flink-sql-apache-iceberg-and-dynamodb-catalog-71b96817e3c3" data-href="https://medium.com/@lazypro/getting-started-with-flink-sql-apache-iceberg-and-dynamodb-catalog-71b96817e3c3" class="markup--anchor markup--p-anchor" target="_blank">introduced Apache Iceberg</a> and built an out-of-the-box experiment environment.</p><div name="70fb" id="70fb" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://github.com/wirelessr/flink-iceberg-playground" data-href="https://github.com/wirelessr/flink-iceberg-playground" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://github.com/wirelessr/flink-iceberg-playground"><strong class="markup--strong markup--mixtapeEmbed-strong">GitHub - wirelessr/flink-iceberg-playground: minio as local storage and DynamoDB as catalog</strong><br><em class="markup--em markup--mixtapeEmbed-em">minio as local storage and DynamoDB as catalog. Contribute to wirelessr/flink-iceberg-playground development by…</em>github.com</a><a href="https://github.com/wirelessr/flink-iceberg-playground" class="js-mixtapeImage mixtapeImage u-ignoreBlock" data-media-id="9821608b63867512e0fe294cedc44f3f" data-thumbnail-img-id="0*HM9shdAH7PojSf4-" style="background-image: url(https://cdn-images-1.medium.com/fit/c/160/160/0*HM9shdAH7PojSf4-);"></a></div><p name="c4ac" id="c4ac" class="graf graf--p graf-after--mixtapeEmbed">The purpose of the article was to experience the integration of Flink SQL and Iceberg, so that I could quickly move on to the next stage of Flink development. Surprisingly, the article was really popular, and I received a few stars on my Github. It made me realize many people like me find these big data technical stacks tough and want a tutorial.</p><p name="bc2f" id="bc2f" class="graf graf--p graf-after--p">So, let’s welcome another big data star, Trino.</p><p name="5681" id="5681" class="graf graf--p graf-after--p">Trino is a popular query engine that provides a single entry point of access to multiple heterogeneous data sources and the ability to query them using SQL. This is a bit abstract, let’s take an example.</p><figure name="682c" id="682c" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*UG__C3hQhQzjTRyyZYVipg.png" data-width="796" data-height="632" src="https://cdn-images-1.medium.com/max/800/1*UG__C3hQhQzjTRyyZYVipg.png"></figure><p name="7884" id="7884" class="graf graf--p graf-after--figure">Even though every data source has different query syntax, Trino integrates well and interacts with users using SQL.</p><p name="2fb3" id="2fb3" class="graf graf--p graf-after--p">In addition to common databases, Trino also supports Iceberg queries. Thus, let’s experience the integration of Trino and Iceberg, and I will provide a experiment environment as well.</p><h3 name="2928" id="2928" class="graf graf--h3 graf-after--p">Experiment environment introduction</h3><p name="11a9" id="11a9" class="graf graf--p graf-after--h3">First, provide the link to the experiment environment.</p><div name="3afc" id="3afc" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://github.com/wirelessr/trino-iceberg-playground" data-href="https://github.com/wirelessr/trino-iceberg-playground" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://github.com/wirelessr/trino-iceberg-playground"><strong class="markup--strong markup--mixtapeEmbed-strong">GitHub - wirelessr/trino-iceberg-playground: Query Iceberg in Trino, Nessie as Catalog, and use…</strong><br><em class="markup--em markup--mixtapeEmbed-em">Query Iceberg in Trino, Nessie as Catalog, and use minio to replace AWS S3 - GitHub …</em>github.com</a><a href="https://github.com/wirelessr/trino-iceberg-playground" class="js-mixtapeImage mixtapeImage u-ignoreBlock" data-media-id="ce0478203ad3e5bc179846514ba53db7" data-thumbnail-img-id="0*ALSZfyuXPyqIJhYR" style="background-image: url(https://cdn-images-1.medium.com/fit/c/160/160/0*ALSZfyuXPyqIJhYR);"></a></div><p name="ec42" id="ec42" class="graf graf--p graf-after--mixtapeEmbed">Before we get started, let’s take a quick look at the basic structure of Trino, which has three layers: catalog, schema, and finally table. Let’s use MongoDB as an example, where catalog corresponds to a database cluster, schema refers to the name of the database under the cluster. As for table, it simply refers to collection.</p><p name="1c31" id="1c31" class="graf graf--p graf-after--p">However, the meaning of this catalog is different from that of Iceberg’s. Iceberg’s catalog is just one of Iceberg’s settings, not the one that Trino recognizes as a catalog.</p><p name="990c" id="990c" class="graf graf--p graf-after--p">Sounds confusing? Let’s look at an existing example, <code class="markup--code markup--p-code"><a href="https://github.com/wirelessr/trino-iceberg-playground/blob/main/example.properties" data-href="https://github.com/wirelessr/trino-iceberg-playground/blob/main/example.properties" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">example.properties</a></code>.</p><pre data-code-block-mode="1" spellcheck="false" data-code-block-lang="ini" name="8a23" id="8a23" class="graf graf--pre graf-after--p graf--preV2"><span class="pre--content"><span class="hljs-attr">connector.name</span>=iceberg<br /><span class="hljs-attr">iceberg.catalog.type</span>=nessie<br /><span class="hljs-attr">iceberg.nessie-catalog.uri</span>=http://catalog:<span class="hljs-number">19120</span>/api/v1<br /><span class="hljs-attr">iceberg.nessie-catalog.default-warehouse-dir</span>=s3://warehouse<br /><span class="hljs-attr">fs.native-s3.enabled</span>=<span class="hljs-literal">true</span><br /><span class="hljs-attr">s3.endpoint</span>=http://storage:<span class="hljs-number">9000</span><br /><span class="hljs-attr">s3.region</span>=us-east-<span class="hljs-number">1</span><br /><span class="hljs-attr">s3.path-style-access</span>=<span class="hljs-literal">true</span><br /><span class="hljs-attr">s3.aws-access-key</span>=admin<br /><span class="hljs-attr">s3.aws-secret-key</span>=password</span></pre><p name="80ed" id="80ed" class="graf graf--p graf-after--pre">This is a Trino catalog setup. We can see this catalog is linked to an Iceberg source. Below we specify the Iceberg-specific catalog as nessie and provide the nessie settings.</p><p name="790b" id="790b" class="graf graf--p graf-after--p">By the way, I wanted to continue to use the previous experiment with Flink SQL and Iceberg, but I found out Trino doesn’t support Iceberg’s <a href="https://github.com/trinodb/trino/issues/9953" data-href="https://github.com/trinodb/trino/issues/9953" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">DynamoDB catalog</a>. Therefore, I had to create a new one.</p><p name="b504" id="b504" class="graf graf--p graf-after--p">So far we have created a catalog called example, and we will continue to build the schema and tables under it.</p><p name="bddf" id="bddf" class="graf graf--p graf-after--p">To initialize the tree structure, we override <a href="https://github.com/wirelessr/trino-iceberg-playground/blob/26b8ebcff52d51ce661c106523f85cae6aeb7907/docker-compose.yaml#L23" data-href="https://github.com/wirelessr/trino-iceberg-playground/blob/26b8ebcff52d51ce661c106523f85cae6aeb7907/docker-compose.yaml#L23" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">command</a> in <code class="markup--code markup--p-code">docker-compose.yaml</code> so that the Trino container calls <code class="markup--code markup--p-code">post-init.sh</code> on startup.</p><pre data-code-block-mode="1" spellcheck="false" data-code-block-lang="bash" name="8b62" id="8b62" class="graf graf--pre graf-after--p graf--preV2"><span class="pre--content"><span class="hljs-meta">#!/bin/bash</span><br /><span class="hljs-built_in">nohup</span> /usr/lib/trino/bin/run-trino &amp;<br /><br /><span class="hljs-built_in">sleep</span> 10<br /><br />trino &lt; /tmp/post-init.sql<br /><br /><span class="hljs-built_in">tail</span> -f /dev/null</span></pre><p name="ed5c" id="ed5c" class="graf graf--p graf-after--pre">In the script, we first wake up Trino’s original startup script, then wait for 10 seconds for Trino to initialize, and then feed the SQL we want to execute. Finally, it waits until it receives a kill signal.</p><h3 name="f9ca" id="f9ca" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="ada7" id="ada7" class="graf graf--p graf-after--h3">In the data engineering world, where new technical stacks are constantly being created, it can be difficult just to play with each one once, not to mention comparing the tools.</p><p name="acb9" id="acb9" class="graf graf--p graf-after--p">So I hope these experiment environments will provide people who want to play around with them a quick experience without actually getting their hands dirty.</p><p name="22f6" id="22f6" class="graf graf--p graf-after--p">As for comparing tools, it would be great if someone had a more complete benchmark report to share with me. For example, I’d love to know, at this point in time (May 2024), what would be the best choice between the three lakehouses? Or how about Trino and Presto?</p><p name="84c4" id="84c4" class="graf graf--p graf-after--p graf--trailing">I have an answer in mind, but I’d like more objective numbers, so feel free to discuss.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/7f4a1f7713ca"><time class="dt-published" datetime="2024-05-20T01:40:38.640Z">May 20, 2024</time></a>.</p><p><a href="https://medium.com/@lazypro/trino-iceberg-made-easy-a-ready-to-use-playground-7f4a1f7713ca" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

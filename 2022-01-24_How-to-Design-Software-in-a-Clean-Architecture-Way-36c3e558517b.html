@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>How to Design Software in a Clean Architecture Way</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">How to Design Software in a Clean Architecture Way</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+A look at the data-oriented design approach
+</section>
+<section data-field="body" class="e-content">
+<section name="91bb" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="96cb" id="96cb" class="graf graf--h3 graf--leading graf--title">How to Design Software in a Clean Architecture Way</h3><h4 name="e191" id="e191" class="graf graf--h4 graf-after--h3 graf--subtitle">A look at the data-oriented design approach</h4><ul class="postList"><li name="d052" id="d052" class="graf graf--li graf-after--h4">Part 1, <a href="https://lazypro.medium.com/how-to-design-in-clean-architecture-way-part-1-36c3e558517b" data-href="https://lazypro.medium.com/how-to-design-in-clean-architecture-way-part-1-36c3e558517b" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">Data-oriented Design</a></li><li name="2149" id="2149" class="graf graf--li graf-after--li">Part 2, <a href="https://lazypro.medium.com/how-to-design-in-clean-architecture-way-part-2-8524e76f2720" data-href="https://lazypro.medium.com/how-to-design-in-clean-architecture-way-part-2-8524e76f2720" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">Domain-driven Design</a></li></ul><figure name="1d23" id="1d23" class="graf graf--figure graf-after--li"><img class="graf-image" data-image-id="0*fdnh2MllxpiW0mcK.jpg" data-width="601" data-height="534" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*fdnh2MllxpiW0mcK.jpg"><figcaption class="imageCaption">Onion Architecture</figcaption></figure><p name="b353" id="b353" class="graf graf--p graf-after--figure">There are many articles and books talking about <em class="markup--em markup--p-em">Clean Architecture</em>, but the focus is on why and what, such as why to use an onion architecture, what each layer represents, and what is the <code class="markup--code markup--p-code">SOLID</code> principle.</p><p name="3c29" id="3c29" class="graf graf--p graf-after--p">However, developers actually want to pay more attention to how, that is, how to write a good program architecture according to those design principles.</p><p name="05ce" id="05ce" class="graf graf--p graf-after--p">In this article, we try to solve a common architectural problem in a clean architectural way.</p><p name="d337" id="d337" class="graf graf--p graf-after--p">In many mobile games or commercial websites, in order to improve user retention, a sign-in mission is designed. If you sign in, you will get some rewards. When you sign in continuously for a certain number of days, there will be additional <strong class="markup--strong markup--p-strong">gift boxes</strong> that can be opened, and you will get bonuses after opening. Let’s try to fulfill this requirement together.</p><h3 name="e0a2" id="e0a2" class="graf graf--h3 graf-after--p">Problem Domain</h3><p name="e0ac" id="e0ac" class="graf graf--p graf-after--h3">Users who log in continuously will get diamonds, as shown in the following table:</p><figure name="9c5d" id="9c5d" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*_AmFxl_4bLq0Vi1m4eTf9w.png" data-width="996" data-height="262" src="https://cdn-images-1.medium.com/max/800/1*_AmFxl_4bLq0Vi1m4eTf9w.png"></figure><p name="9729" id="9729" class="graf graf--p graf-after--figure">To simplify the problem, let’s get a fixed amount of 100 diamonds the gift box is opened each time. For example, if a user signs in for four consecutive days, the user can get 30 and a gift box on the fifth day of sign-in.</p><p name="ab87" id="ab87" class="graf graf--p graf-after--p">Every time the user enters the homepage, he will see a sign-in map, telling the user how many consecutive sign-ins have been completed in this cycle and how many rewards have been received.</p><h3 name="7f43" id="7f43" class="graf graf--h3 graf-after--p">Design Phase</h3><p name="0840" id="0840" class="graf graf--p graf-after--h3">There are two different design approaches, data-oriented design and domain-driven design. We will start talking about data-oriented design and tell you why it’s not a mainstream design solution.</p><h3 name="e42d" id="e42d" class="graf graf--h3 graf-after--p">Data-oriented Design (Can’t Say Good Approach)</h3><p name="ed9c" id="ed9c" class="graf graf--p graf-after--h3">The data-oriented design means that when we see a problem, we first think about how to store the data, and then manipulate the defined data format to try to solve the original problem.</p><p name="d3b3" id="d3b3" class="graf graf--p graf-after--p">Therefore, after getting the question, the first step is to think about what database to use, what schema it will have, and what format the data will exist in.</p><p name="f004" id="f004" class="graf graf--p graf-after--p">Let’s take the sign-in mission as an example. Suppose we design on a small monolith, usually with a relational database, so we first define a table to realize our problem. Define a sign-in table to store the time of each sign-in, so that you can know how many rewards you can get based on the previous sign-in records.</p><figure name="0173" id="0173" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*bVsEN_OV0l2mHsfLfSia3w.png" data-width="404" data-height="478" src="https://cdn-images-1.medium.com/max/800/1*bVsEN_OV0l2mHsfLfSia3w.png"></figure><p name="a54d" id="a54d" class="graf graf--p graf-after--figure">From the above table, if today is <code class="markup--code markup--p-code">2022-01-04</code>, then John can get 15 diamonds when he signs in, and Mary will start a new cycle because she has not signed in consecutively and only get 10 diamonds.</p><p name="2401" id="2401" class="graf graf--p graf-after--p">The logic of the mission will be to filter the sign-in date of a specific user and sort them by date, then retrieve the latest <code class="markup--code markup--p-code">N</code> records. By calculating the total days of the consecutive sign-ins, and then you can know what reward to get this time.</p><p name="d81b" id="d81b" class="graf graf--p graf-after--p">There is a problem with such design. When the user’s sign-in is not interrupted at all, i.e., the number of consecutive sign-in days is greater than <code class="markup--code markup--p-code">N</code>, then the amount of data is not enough to determine the current reward. Nevertheless, we do not want to expand <code class="markup--code markup--p-code">N</code> to avoid pulling too much data makes the database a bottleneck. Thus, we should try making some changes to the original schema, such as adding a new field, diamond.</p><figure name="c7ef" id="c7ef" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*aECKyWRW9iLDbj54SnbvYw.png" data-width="610" data-height="710" src="https://cdn-images-1.medium.com/max/800/1*aECKyWRW9iLDbj54SnbvYw.png"></figure><p name="419d" id="419d" class="graf graf--p graf-after--figure">For John, signing in on <code class="markup--code markup--p-code">2022-01-09</code> will get 10 diamonds because we know the end of the previous cycle was <code class="markup--code markup--p-code">2022-01-07</code>.</p><p name="f541" id="f541" class="graf graf--p graf-after--p">The story is not over yet. When the number of users grow, the performance of RDBMS will be tough. Every time you enter the homepage, you have to pull data from the database, run a complex calculation, and finally see the result. This process is very inefficient.</p><p name="940f" id="940f" class="graf graf--p graf-after--p">In order to improve the efficiency of the homepage, most projects will introduce a cache to record the status of the entire sign-in. However, how do you know if the cache is invalid? Or the cache is actually not invalid, but distorted. I have covered this problem in a previous article <a href="https://towardsdev.com/resilient-caching-in-redis-a5b3c1a49f14" data-href="https://towardsdev.com/resilient-caching-in-redis-a5b3c1a49f14" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">Resilient Caching</a>. By adding integrity, we can distinguish whether the data is reliable. Once the data is corrupted, we will rebuild the data from the RDBMS.</p><h3 name="879a" id="879a" class="graf graf--h3 graf-after--p">Summary</h3><p name="d606" id="d606" class="graf graf--p graf-after--h3">From the above introduction, we found that even the cache has many aspects to consider, the whole data-oriented design is very complicated, and the process is very struggled.</p><p name="9da5" id="9da5" class="graf graf--p graf-after--p">Hence, the domain-driven design was born.</p><p name="b84a" id="b84a" class="graf graf--p graf-after--p graf--trailing">In part 2, we will start designing from Entity, covering use cases, then implementing the unit tests like TDD, and finally completing our mission. I will provide a better design process, and you can follow the steps to simplify every user stories you will encounter. Let&#39;s call it a day. Until next time</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/36c3e558517b"><time class="dt-published" datetime="2022-01-24T01:11:28.418Z">January 24, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/how-to-design-in-clean-architecture-way-part-1-36c3e558517b" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

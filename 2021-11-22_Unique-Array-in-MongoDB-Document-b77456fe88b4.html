@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Unique Array in MongoDB Document</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Unique Array in MongoDB Document</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Accomplish a unique constraint on an array field by using some tricks in MongoDB.
+</section>
+<section data-field="body" class="e-content">
+<section name="b711" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="c599" id="c599" class="graf graf--h3 graf--leading graf--title">Unique Array in MongoDB Document</h3><figure name="4d48" id="4d48" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*9KOWrIA6crjXcMXM.png" data-width="1500" data-height="500" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*9KOWrIA6crjXcMXM.png"></figure><p name="54d6" id="54d6" class="graf graf--p graf-after--figure">In order to explain the solution in detail, I have to introduce the user scenario first. We need a collection to record the group information including name, members, etc. However, we cannot allow a group with the same members in another group. For example, if <code class="markup--code markup--p-code">A</code> and <code class="markup--code markup--p-code">B</code> are in group 1, then they cannot be in group 2. Thus, we need maintain a members array which has an unique constraint.</p><p name="7bea" id="7bea" class="graf graf--p graf-after--p">There is an assumption in our requirement.</p><blockquote name="bf24" id="bf24" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">The amount of group members will be always 2. In other words, a group only has members </em><code class="markup--code markup--blockquote-code"><em class="markup--em markup--blockquote-em">[&quot;A&quot;, &quot;B&quot;]</em></code><em class="markup--em markup--blockquote-em"> but not </em><code class="markup--code markup--blockquote-code"><em class="markup--em markup--blockquote-em">[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</em></code><em class="markup--em markup--blockquote-em">.</em></blockquote><p name="af20" id="af20" class="graf graf--p graf-after--blockquote">Here comes an example collection:</p><pre name="f07a" id="f07a" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">[{<br>    &quot;_id&quot;: 1,<br>    &quot;name&quot;: &quot;group1&quot;,<br>    &quot;members&quot;: [&quot;A&quot;, &quot;B&quot;]<br>}, {<br>    &quot;_id&quot;: 2,<br>    &quot;name&quot;: &quot;group2&quot;,<br>    &quot;members&quot;: [&quot;A&quot;, &quot;C&quot;]<br>}]</code></pre><p name="3877" id="3877" class="graf graf--p graf-after--pre">We want to query more faster, so we add an index on members, however, <a href="https://docs.mongodb.com/manual/core/index-multikey/" data-href="https://docs.mongodb.com/manual/core/index-multikey/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">MongoDB Multikey Index</a> is very different from what our thought.</p><ul class="postList"><li name="7ebd" id="7ebd" class="graf graf--li graf-after--p">Can we add an unique index on members?</li><li name="f8ca" id="f8ca" class="graf graf--li graf-after--li">If the index type is regular, the answer is no.</li><li name="9477" id="9477" class="graf graf--li graf-after--li">Can <code class="markup--code markup--li-code">db.group.find({members: [&quot;B&quot;, &quot;A&quot;]})</code> find anything？</li><li name="7c3c" id="7c3c" class="graf graf--li graf-after--li">No, the array should be exactly matched.</li></ul><p name="1263" id="1263" class="graf graf--p graf-after--li">The root cause is creating an index on array, the index will become multikey index automatically. For the document with id 1, there will be two indexes Indicating to this document, namely <code class="markup--code markup--p-code">&quot;A&quot;</code> and <code class="markup--code markup--p-code">&quot;B&quot;</code>. In the same way, there will be two indexes, <code class="markup--code markup--p-code">&quot;A&quot;</code> and <code class="markup--code markup--p-code">&quot;C&quot;</code>, on document with id 2. That is to say, unique constraint doesn’t work while they all have index <code class="markup--code markup--p-code">&quot;A&quot;</code>.</p><p name="2a05" id="2a05" class="graf graf--p graf-after--p">Although, there are two indexes <code class="markup--code markup--p-code">&quot;A&quot;</code> and <code class="markup--code markup--p-code">&quot;B&quot;</code> on document 1, it just makes MongoDB retrieve data faster. Instead of the full-table scan, MongoDB can reduce the search scope, especially, the linear search with <code class="markup--code markup--p-code">O(n)</code> is very slow on the array match. However, it has to exactly match the array including the order.</p><p name="e54b" id="e54b" class="graf graf--p graf-after--p">How to solve these problems? There is a trick can handle, that is, use <a href="https://docs.mongodb.com/manual/core/index-text/" data-href="https://docs.mongodb.com/manual/core/index-text/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">text index</a>. The figure comes from MongoDB Compass as follows.</p><figure name="44fe" id="44fe" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*oGdHtxi0cZWTF2md.png" data-width="1834" data-height="186" src="https://cdn-images-1.medium.com/max/800/0*oGdHtxi0cZWTF2md.png"></figure><p name="87cc" id="87cc" class="graf graf--p graf-after--figure">Although the number of uses is 0, this is actually caused by MongoDB’s implementation. The search for the text index is to compare the text first, and then use <code class="markup--code markup--p-code">_id</code> to locate the real content.</p><p name="84c9" id="84c9" class="graf graf--p graf-after--p">Nevertheless, this approach comes other problems when implementing applications:</p><ol class="postList"><li name="dc7e" id="dc7e" class="graf graf--li graf-after--p">To find the content, we must know the order of members; otherwise, data cannot be retrieved.</li><li name="d118" id="d118" class="graf graf--li graf-after--li">Similar to the problem one, even though this approach can make sure <code class="markup--code markup--li-code">[&quot;A&quot;, &quot;B&quot;]</code> will not be duplicated, it cannot reject the insertion with <code class="markup--code markup--li-code">[&quot;B&quot;, &quot;A&quot;]</code>.</li><li name="b1fd" id="b1fd" class="graf graf--li graf-after--li">The search pattern, regarding whether a single target exists in members, is inefficient. We have to use <code class="markup--code markup--li-code">$in</code> without the bound from an index to reduce the search scope.</li></ol><p name="3cf7" id="3cf7" class="graf graf--p graf-after--li">There is a comprise solution to the problem 1 and 2. Before inserting or fetching data in the database, we sort the members in the application. However, this approach ties the data model and application logic together, which is hard to maintain and use. Hence, it is highly not recommended. As for the problem 3, there is no alternative solution.</p><h3 name="4b39" id="4b39" class="graf graf--h3 graf-after--p">Solution</h3><p name="70d9" id="70d9" class="graf graf--p graf-after--h3">The correct (*see the last section) approach is still using the multikey and text index. But we don’t store scalar string in members; instead, we store objects. Thus, the original example will be modified slightly:</p><pre name="3c5b" id="3c5b" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">[{<br>    &quot;_id&quot;: 1,<br>    &quot;name&quot;: &quot;group1&quot;,<br>    &quot;members&quot;: [{&quot;name&quot;: &quot;A&quot;}, {&quot;name&quot;: &quot;B&quot;}]<br>}, {<br>    &quot;_id&quot;: 2,<br>    &quot;name&quot;: &quot;group2&quot;,<br>    &quot;members&quot;: [{&quot;name&quot;: &quot;A&quot;}, {&quot;name&quot;: &quot;C&quot;}]<br>}]</code></pre><p name="f070" id="f070" class="graf graf--p graf-after--pre">In addition, the index on members should be on <code class="markup--code markup--p-code">members.name</code> with the text type and unique constraint.</p><p name="6743" id="6743" class="graf graf--p graf-after--p">From the above example we can see the original members is changed from <code class="markup--code markup--p-code">[&quot;A&quot;, &quot;B&quot;]</code> to <code class="markup--code markup--p-code">[{&quot;name&quot;: &quot;A&quot;}, {&quot;name&quot;: &quot;B&quot;}]</code>. So what are the benefits of doing this? Yes, in fact, the three problems mentioned above have all been solved.</p><ol class="postList"><li name="b109" id="b109" class="graf graf--li graf-after--p">We don’t care the order of members when searching a group. We can just use <code class="markup--code markup--li-code">db.group.find({$and: [{&quot;members.name&quot;: &quot;A&quot;}, {&quot;members.name&quot;: &quot;B&quot;}]})</code>.</li><li name="6e29" id="6e29" class="graf graf--li graf-after--li">We don’t care whether <code class="markup--code markup--li-code">&quot;A&quot;</code> is the former or the letter, it can be rejected correctly if there is indeed a group with <code class="markup--code markup--li-code">&quot;A&quot;</code> and <code class="markup--code markup--li-code">&quot;B&quot;</code>.</li><li name="0597" id="0597" class="graf graf--li graf-after--li">To find a group belongs to a specific member, we can use <code class="markup--code markup--li-code">db.group.find({&quot;members.name&quot;: &quot;A&quot;})</code>. This can find out all groups <code class="markup--code markup--li-code">&quot;A&quot;</code> belongs.</li></ol><p name="cf4b" id="cf4b" class="graf graf--p graf-after--li">It must be emphasized again that this solution is only applicable when all groups are composed of two members. Take the above example, if you want to create a group 3 with members <code class="markup--code markup--p-code">&quot;A&quot;, &quot;B&quot;, &quot;C&quot;</code>, it will be denied.</p><p name="1b95" id="1b95" class="graf graf--p graf-after--p">Why we have a such requirement? We want to simplify the know-how of database operations on the client side. In theory, the client does not need to have any knowledge to manipulate the data of the database, and the database can always respond under inappropriate circumstances. Therefore, we don’t have to embed the database logic into every client. Nonetheless, the approach has its disadvantages. Firstly, the design has been fixed to only support groups of 2 members. Secondly, there is only one text index in a collection, i.e., we sacrifice the possibility of other text indexes. Finally, text index takes lots of spaces, it is considered a high price index.</p><p name="b89e" id="b89e" class="graf graf--p graf-after--p">What should be the correct way? There are many possibilities, but the most feasible one should be <code class="markup--code markup--p-code"><a href="https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/" data-href="https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">findAndModify</a></code> with <code class="markup--code markup--p-code">upsert</code>. By doing this, we can avoid creating a group with duplicated<br>members under the race condition. If there is a need to add more members, we can leverage <code class="markup--code markup--p-code">$addToSet</code> to operate on members to keep the uniqueness in members. From this we can know that to maintain the correctness of the data, there are many implementation requirements on the client side, so in the end we decided to write the integrity to the database and let the database take care of part of the correctness of the data.</p><h3 name="f9d7" id="f9d7" class="graf graf--h3 graf-after--p">Updated</h3><p name="22b0" id="22b0" class="graf graf--p graf-after--h3 graf--trailing">We have found the multikey index in text type does not work in some conditions. Therefore, we are using <code class="markup--code markup--p-code">$addToSet</code> to be the temporary solution and still trying to find out a better approach.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/b77456fe88b4"><time class="dt-published" datetime="2021-11-22T07:43:05.423Z">November 22, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/unique-array-in-mongodb-document-b77456fe88b4" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

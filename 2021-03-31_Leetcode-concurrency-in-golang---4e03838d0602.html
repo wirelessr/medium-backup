@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Leetcode concurrency in golang總結</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Leetcode concurrency in golang總結</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+這次在leetcode中選了concurrency類別的6題(總共也只有6題)來練習golang，主要是為了熟悉golang的語法，和體會goroutine的強大。實際解題後，對於golang這個語言又有了新一層的認知，在這篇我會就我寫過的程式語言做些比較並給點簡單的心得。
+</section>
+<section data-field="body" class="e-content">
+<section name="a24f" class="section section--body section--first"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="1335" id="1335" class="graf graf--h3 graf--leading graf--title">Leetcode concurrency in golang總結</h3><figure name="3a32" id="3a32" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*-0p9sWtQYUqesdqW.jpg" data-width="1200" data-height="697" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*-0p9sWtQYUqesdqW.jpg"></figure><p name="b862" id="b862" class="graf graf--p graf-after--figure">這次在leetcode中選了concurrency類別的6題(總共也只有6題)來練習golang，主要是為了熟悉golang的語法，和體會goroutine的強大。實際解題後，對於golang這個語言又有了新一層的認知，在這篇我會就我寫過的程式語言做些比較並給點簡單的心得。</p><p name="6d19" id="6d19" class="graf graf--p graf-after--p">首先，先回顧一下這六題：</p><p name="d4fd" id="d4fd" class="graf graf--p graf-after--p"><a href="https://lazypro.medium.com/leetcode-concurrency-1114-print-in-order-in-golang-f3115f6d82c6" data-href="https://lazypro.medium.com/leetcode-concurrency-1114-print-in-order-in-golang-f3115f6d82c6" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#1114</a>，是最簡單的一題，透過channel的強大支援，就可以很好的協調所有的goroutine。</p><p name="989c" id="989c" class="graf graf--p graf-after--p"><a href="https://lazypro.medium.com/leetcode-concurrency-1115-print-foobar-alternately-in-golang-ca9295ee4b16" data-href="https://lazypro.medium.com/leetcode-concurrency-1115-print-foobar-alternately-in-golang-ca9295ee4b16" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#1115</a>，就再稍微有趣一點，依然可以用channel簡單做，但其實也可以透過Barrier收得更美，只是在Barrier底下要維持foobar的順序要花點心思。</p><p name="9f6d" id="9f6d" class="graf graf--p graf-after--p"><a href="https://lazypro.medium.com/leetcode-concurrency-1116-print-zero-even-odd-in-golang-bd7e614b04f2" data-href="https://lazypro.medium.com/leetcode-concurrency-1116-print-zero-even-odd-in-golang-bd7e614b04f2" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#1116</a>，可以透過channel做，但因為有三個goroutine，要分配誰該做事誰該等待會有點複雜；用Barrier做的話也有誰先誰後的問題要解決。所以最後我決定用一個比較不一樣的選擇：使用生產者消費者模型。</p><p name="308e" id="308e" class="graf graf--p graf-after--p"><a href="https://lazypro.medium.com/leetcode-concurrency-1117-building-h2o-in-golang-29034abd2894" data-href="https://lazypro.medium.com/leetcode-concurrency-1117-building-h2o-in-golang-29034abd2894" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#1117</a>，典型的信號題，透過信號可以順利解決問題，但golang的信號無法空等，和pthread的行為不同，這點要額外注意。</p><p name="ef23" id="ef23" class="graf graf--p graf-after--p"><a href="https://lazypro.medium.com/leetcode-concurrency-1195-fizz-buzz-multithreaded-in-golang-e01ab37be401" data-href="https://lazypro.medium.com/leetcode-concurrency-1195-fizz-buzz-multithreaded-in-golang-e01ab37be401" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#1195</a>，典型的Barrier題，為什麼這題是典型題，但1115不是？最主要的差別在於，1195的所有worker雖然全部都要按照順序執行某一樣固定任務，但每一個任務只有一個worker確切會做事，因此worker間不需要彼此協調。但1115則是需要foo和bar同步，foo一定要先，才是bar。</p><p name="12df" id="12df" class="graf graf--p graf-after--p graf--trailing"><a href="https://lazypro.medium.com/leetcode-concurrency-1226-the-dining-philosophers-in-golang-c73950e098a2" data-href="https://lazypro.medium.com/leetcode-concurrency-1226-the-dining-philosophers-in-golang-c73950e098a2" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#1226</a>，典型的教科書題，哲學家用餐問題。一堆教科書都寫過解法所以也沒什麼好說的，這邊就是其中一種教科書解法，依序拿兩個鎖，反序釋放。</p></div></div></section><section name="c133" class="section section--body section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><p name="250a" id="250a" class="graf graf--p graf--leading">練習了這些同步的問題，對於goroutine和channel有了進一步認識，但這些問題其實沒帶到兩個進階用法：buffered channel和select(unblock read/write)，之後我會再找機會練習；另外有些進階語法也沒機會使用到，例如把channel當初func的input/output。這些其實在看open source的時候都還算常見，但因為不熟所以會看得很痛苦，這次沒練習到實屬可惜。</p><p name="dcef" id="dcef" class="graf graf--p graf-after--p">最後是與一些常見語言的比較，這邊舉Linux C、Python3和golang做對比。</p><p name="b0d5" id="b0d5" class="graf graf--p graf-after--p">語感上Python3還是完勝，主要是因為Python是個弱型別語言，所以變數和容器都可以龍蛇雜處，另外，Python的list/dict也不需要allocate，golang必須要在宣告後make，這點在純Python programmer眼裡實在有夠不自然。但golang還是比C語言好上一截，至少在array/slice的操作上，比起C更加直覺，天生支援回傳多值也比C方便許多。此外，golang的strcut還可以包function，這點也比C更加實用。</p><p name="72fb" id="72fb" class="graf graf--p graf-after--p">golang有一點很特別的是，支援指標/定址，這點褒貶不一，但在我眼裡其實弊大於利。首先，在宣告func和struct時，實在很難搞懂到底要不要加星號，舉例來說，sync.WaitGroup大部分的範例都有加星號，但sync.Mutex卻沒有，這標準是什麼？我現在就也是照抄而已，還沒搞懂背後的原因。至於func的參數，golang天生就是call-by-value，即使是array/slice/map也是call-by-value，這很容易讓無論是C還是Python programmer踩坑。</p><p name="d0e4" id="d0e4" class="graf graf--p graf-after--p">在multi-task方面，Python可以選擇multi-process/multi-thread/coroutine，golang有天生自帶的goroutine，而C只有multi-process/multi-thread。不得不說，goroutine實在太強太好寫了，Python的coroutine還要搞一堆async/await，麻煩到不行，也有夠不直覺。但goroutine不用，就正常寫就好，在這點絕對是大勝Python十條街以上。而且在同步處理的部分，有channel實在方便，可以通知/等待，在C/Python都必須透過pthread提供的lock和condition來協調，其實不太好用，沒有語法糖。</p><p name="7eba" id="7eba" class="graf graf--p graf-after--p graf--trailing">總體來說，我個人還是覺得Python &gt; golang &gt; C，但在同步處理上或者單一功能的小型app上，golang &gt; Python &gt; C。主要原因有二，其一是goroutine很容易開發；其二，golang可以直接build出binary比起肥死人的Python和一堆side-packages更容易移植。</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/4e03838d0602"><time class="dt-published" datetime="2021-03-31T03:25:37.822Z">March 31, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/leetcode-concurrency-in-golang%E7%B8%BD%E7%B5%90-4e03838d0602" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

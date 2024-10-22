@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Leetcode concurrency #1116 Print Zero Even Odd (in golang)</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Leetcode concurrency #1116 Print Zero Even Odd (in golang)</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+之前寫了#1114和#1115，都是用channel互相通知，叫正確的人起來做事；這在golang中算是很常見的作法，但這次的題目我想用比較傳統的方式解決，我將題目轉成一種producer-consumer的架構來解。
+</section>
+<section data-field="body" class="e-content">
+<section name="4ec9" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="9036" id="9036" class="graf graf--h3 graf--leading graf--title">Leetcode concurrency #1116 Print Zero Even Odd (in golang)</h3><figure name="cf85" id="cf85" class="graf graf--figure graf-after--h3"><img class="graf-image" data-image-id="0*cEn77TUTh-hOjIXA.png" data-width="820" data-height="364" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/0*cEn77TUTh-hOjIXA.png"></figure><p name="6b7e" id="6b7e" class="graf graf--p graf-after--figure">之前寫了<a href="https://lazypro.medium.com/leetcode-concurrency-1114-print-in-order-in-golang-f3115f6d82c6" data-href="https://lazypro.medium.com/leetcode-concurrency-1114-print-in-order-in-golang-f3115f6d82c6" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#1114</a>和<a href="https://lazypro.medium.com/leetcode-concurrency-1115-print-foobar-alternately-in-golang-ca9295ee4b16" data-href="https://lazypro.medium.com/leetcode-concurrency-1115-print-foobar-alternately-in-golang-ca9295ee4b16" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">#1115</a>，都是用channel互相通知，叫正確的人起來做事；這在golang中算是很常見的作法，但這次的題目我想用比較傳統的方式解決，我將題目轉成一種producer-consumer的架構來解。</p><div name="9f2e" id="9f2e" class="graf graf--mixtapeEmbed graf-after--p"><a href="https://leetcode.com/problems/print-zero-even-odd/" data-href="https://leetcode.com/problems/print-zero-even-odd/" class="markup--anchor markup--mixtapeEmbed-anchor" title="https://leetcode.com/problems/print-zero-even-odd/"><strong class="markup--strong markup--mixtapeEmbed-strong">Print Zero Even Odd - LeetCode</strong><br><em class="markup--em markup--mixtapeEmbed-em">Suppose you are given the following code: class ZeroEvenOdd { public ZeroEvenOdd(int n) { ... } // constructor public…</em>leetcode.com</a><a href="https://leetcode.com/problems/print-zero-even-odd/" class="js-mixtapeImage mixtapeImage u-ignoreBlock" data-media-id="e38e888bab786bfec139bea247fb28fd" data-thumbnail-img-id="0*LBgQptkniACXSBhs" style="background-image: url(https://cdn-images-1.medium.com/fit/c/160/160/0*LBgQptkniACXSBhs);"></a></div><p name="d848" id="d848" class="graf graf--p graf-after--mixtapeEmbed">照慣例，題目解析：有一個class內有三個method，分別是印出0、偶數和奇數，跑三個thread各run一個method，輸入一個n要與0依序印出。舉例來說：n = 5，印出來的結果是：0102030405，依此類推。</p><p name="977b" id="977b" class="graf graf--p graf-after--p">這次解決的方法有點偷懶，正常的producer-consumer架構是要用一個queue，把東西丟入然後由consumer取出運算，但我只用兩個整數表示這個隊列，就沒去處理enqueue和dequeue的邏輯。</p><figure name="6924" id="6924" class="graf graf--figure graf--iframe graf-after--p"><script src="https://gist.github.com/wirelessr/c06e7d8117c2851a4a97f2ea48d3042f.js"></script></figure><p name="d21b" id="d21b" class="graf graf--p graf-after--figure">相比前面的解答算是再長了一些，這次用到一個互斥鎖來同步狀態，當要存取狀態時要取得鎖才有辦法繼續。也有在判斷條件內加入中止條件，也就是狀態是-1時就結束迴圈。用到鎖就比較繁複，有時間的話會試試看有沒有辦法把解鎖的地方處理的更漂亮。</p><p name="c02a" id="c02a" class="graf graf--p graf-after--p">若是consumer要做的事都一樣，這樣的寫法就足夠了，起多個goroutine可以有效加速消化。但是這次的題目會有一個edge case：因為是三人搶一鎖，而且每個人各司其職，所以有可能會starvation。舉例來說：當狀態curr = 2，理當由even接手，但若不幸的是，even搶不到鎖，變成是zero和odd兩個人互相把鎖丟來丟去，就空轉了。所以解答改良版如下：</p><figure name="e8fc" id="e8fc" class="graf graf--figure graf--iframe graf-after--p"><script src="https://gist.github.com/wirelessr/ef8f35249d3752980e300468bbe2e31e.js"></script></figure><p name="97c7" id="97c7" class="graf graf--p graf-after--figure graf--trailing">變得更長了！兩個重點：一個是使用RWLock而不是互斥鎖，這樣在讀取狀態時人人有機會，不會發生搶不到的情況；其二，讀取鎖放掉後，若要繼續做事需要拿寫入鎖，但在拿到寫入鎖後，還是必須再判斷一次狀態，因為鎖放掉後就有可能有人改變狀態（雖然這題不會發生這種事，因為各司其職）。</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/bd7e614b04f2"><time class="dt-published" datetime="2021-03-26T15:11:10.976Z">March 26, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/leetcode-concurrency-1116-print-zero-even-odd-in-golang-bd7e614b04f2" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

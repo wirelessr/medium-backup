@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>How to avoid the race condition and the negative value</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">How to avoid the race condition and the negative value</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+easy way in MySQL
+</section>
+<section data-field="body" class="e-content">
+<section name="efbc" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="3457" id="3457" class="graf graf--h3 graf--leading graf--title">How to avoid the race condition and the negative value</h3><h3 name="9f88" id="9f88" class="graf graf--h3 graf-after--h3">Scenario</h3><p name="30e2" id="30e2" class="graf graf--p graf-after--h3">Suppose there is a table, <code class="markup--code markup--p-code">bank</code>.</p><figure name="dbc9" id="dbc9" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*tnO9dzAJol3qf9CGHvye6Q.png" data-width="328" data-height="246" src="https://cdn-images-1.medium.com/max/800/1*tnO9dzAJol3qf9CGHvye6Q.png"></figure><p name="4f52" id="4f52" class="graf graf--p graf-after--figure">Both A and B have 100, and A will transfer 70 dollars to B twice.</p><h3 name="3ccf" id="3ccf" class="graf graf--h3 graf-after--p">Simple Design: Wire after Checking Balance</h3><p name="62ac" id="62ac" class="graf graf--p graf-after--h3">It would be like this in pseudo-code:</p><pre name="90c3" id="90c3" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">A_owned = `select money from bank where name = A`<br>B_owned = `select money from bank where name = B`<br>if A_owned &gt;= 70:<br>    `update bank set money = A_owned - 70 where name = A`<br>    `update bank set money = B_owned + 70 where name = B`</code></pre><p name="ff62" id="ff62" class="graf graf--p graf-after--pre">This is the simplest design; however, there are two defects:</p><ol class="postList"><li name="bae1" id="bae1" class="graf graf--li graf-after--p">Remained money is incorrect after updating.</li><li name="de84" id="de84" class="graf graf--li graf-after--li">After remitting, the balance comes to a negative value.</li></ol><p name="1871" id="1871" class="graf graf--p graf-after--li">Let’s watch these two issues separately.</p><p name="3875" id="3875" class="graf graf--p graf-after--p">The root cause of the first issue is that if <code class="markup--code markup--p-code">A</code> initiates two transfers at the same time, both of the two times <code class="markup--code markup--p-code">A_owned</code> would be 100. We introduce this situation in time-series diagram below:</p><figure name="2c52" id="2c52" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*DHssXlZjCzpLyo7XsxhMGA.png" data-width="1384" data-height="654" src="https://cdn-images-1.medium.com/max/800/1*DHssXlZjCzpLyo7XsxhMGA.png"></figure><p name="578b" id="578b" class="graf graf--p graf-after--figure">Finally, the <code class="markup--code markup--p-code">A</code>’s balance will become 30. This is the classic race condition. How to solve it?</p><h3 name="3e5d" id="3e5d" class="graf graf--h3 graf-after--p">Solution of Race Condition</h3><p name="ac71" id="ac71" class="graf graf--p graf-after--h3">In order to solve the race condition, there are three ways:</p><ol class="postList"><li name="658b" id="658b" class="graf graf--li graf-after--p">Atomic Update</li><li name="a573" id="a573" class="graf graf--li graf-after--li">Transaction plus Lock</li><li name="5982" id="5982" class="graf graf--li graf-after--li">Version Scheme</li></ol><h3 name="912d" id="912d" class="graf graf--h3 graf-after--li">Atomic Update</h3><p name="a9dd" id="a9dd" class="graf graf--p graf-after--h3">The problem of this situation is using the unreliable data. To prevent this from happening, we shouldn’t update records via using the previous results but the current value in the database.</p><p name="11aa" id="11aa" class="graf graf--p graf-after--p">Change the origin statement:</p><blockquote name="aeae" id="aeae" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">update bank set money = A_owned — 70 where name = A</em></blockquote><p name="3144" id="3144" class="graf graf--p graf-after--blockquote">to the new statement:</p><blockquote name="8f44" id="8f44" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">update bank set money = money — 70 where name = A</em></blockquote><p name="1780" id="1780" class="graf graf--p graf-after--blockquote">This is the atomic update.</p><h3 name="a854" id="a854" class="graf graf--h3 graf-after--p">Transaction plus Lock</h3><p name="b00c" id="b00c" class="graf graf--p graf-after--h3">Before the introduction, I have to say, most people have a misunderstanding of the transaction. The transaction is not invincible and cannot avoid all race conditions. Thinking the transaction as a panacea is so wrong.</p><p name="c0bc" id="c0bc" class="graf graf--p graf-after--p">The transaction is invincible <strong class="markup--strong markup--p-strong">IF</strong> the isolation level of MySQL is set to <em class="markup--em markup--p-em">Serializable Isolation</em>; nevertheless, <em class="markup--em markup--p-em">Serializable Isolation</em> affects the database performance dramatically. Therefore, the most accepted compromise is <em class="markup--em markup--p-em">Repeatable Read Isolation</em>. On the other hand, MySQL is not able to prevent the race condition in the such criteria. According to the <a href="https://stackoverflow.com/questions/53562850/mysql-repeatable-read-isolation-level-and-lost-update-phenomena" data-href="https://stackoverflow.com/questions/53562850/mysql-repeatable-read-isolation-level-and-lost-update-phenomena" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">reference</a>, <em class="markup--em markup--p-em">InnoDB</em> cannot handle <code class="markup--code markup--p-code">Lost Update</code> and <code class="markup--code markup--p-code">Phantom</code>, i.e., the race condition will still be happened.</p><p name="f2f1" id="f2f1" class="graf graf--p graf-after--p">If you say that, what is the use of the transaction?</p><p name="201f" id="201f" class="graf graf--p graf-after--p">The transaction is to protect the integrity of a bunch of database operations. We can rollback all the changing data if there is any error occurred, so that the dirty data will not commit into the database.</p><p name="cbb6" id="cbb6" class="graf graf--p graf-after--p">Let’s get down to the business; how to leverage the transaction? The example is as follows:</p><pre name="5aef" id="5aef" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">start transaction<br>A_owned = `select money from bank where name = A for update`<br>if A_owned &gt;= 70:<br>    `update bank set money = A_owned - 70 where name = A`<br>commit</code></pre><p name="a211" id="a211" class="graf graf--p graf-after--pre">By using <code class="markup--code markup--p-code">for update</code>, it can acquire an exclusive lock on the desired row. If another transaction with the same row entered, it must wait for the lock released. The working flow is like below:</p><figure name="1191" id="1191" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*nxZSMf4aCpfj-EZrZOgYFg.png" data-width="1376" data-height="666" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*nxZSMf4aCpfj-EZrZOgYFg.png"></figure><p name="2d15" id="2d15" class="graf graf--p graf-after--figure">From the diagram above, we can know <code class="markup--code markup--p-code">A2</code> gets the value after <code class="markup--code markup--p-code">A1</code> has been finished. In addition, <code class="markup--code markup--p-code">A2</code> gets 30 which is not enough to the transfer, thus, <code class="markup--code markup--p-code">A2</code> finishes its job without doing anything.</p><h3 name="64aa" id="64aa" class="graf graf--h3 graf-after--p">Version Scheme</h3><p name="2c2e" id="2c2e" class="graf graf--p graf-after--h3">This approach is much more complicated than the two mentioned. We have to alter table to add a new column, version, to record the changes.</p><figure name="11b2" id="11b2" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*jjYRowyytXF7j1xXSCvh8g.png" data-width="502" data-height="246" src="https://cdn-images-1.medium.com/max/800/1*jjYRowyytXF7j1xXSCvh8g.png"></figure><p name="d112" id="d112" class="graf graf--p graf-after--figure">Before updating data, we have to retrieve the version first then update the row on the specific version. The code is like:</p><pre name="304a" id="304a" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">A_owned, old_ver = `select money, version from bank where name = A`<br>if A_owned &gt;= 70:<br>    `update bank set money = 30, version = version + 1 where name = A and version = old_ver`</code></pre><p name="f191" id="f191" class="graf graf--p graf-after--pre">Updating data and comparing the version must be executed simultaneously; otherwise, the operation will be failed. Let’s explain with a time-series diagram:</p><figure name="8140" id="8140" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*zgufdP08vjr-cYzFExbbAQ.png" data-width="1388" data-height="392" src="https://cdn-images-1.medium.com/max/800/1*zgufdP08vjr-cYzFExbbAQ.png"></figure><p name="48c4" id="48c4" class="graf graf--p graf-after--figure">After <code class="markup--code markup--p-code">A1</code> updates the row, the database returns 1 means there is one row affected, i.e., it updated successfully. But, <code class="markup--code markup--p-code">A2</code> gets 0; in other words, no row is updated.</p><h3 name="5826" id="5826" class="graf graf--h3 graf-after--p">To Sum Up</h3><p name="3ec0" id="3ec0" class="graf graf--p graf-after--h3">We know there are three approaches to solve the race condition from the above introduction. However, the cost of the version scheme is too high, and the performance of the transaction plus lock is too poor. We really don’t need the heavy synchronization like the exclusive lock on an essential operation.</p><p name="8de5" id="8de5" class="graf graf--p graf-after--p">The atomic update is a better solution to apply to most use cases. Although we will no longer lose updates, negative values may still occur. Because the money is deducted 70 twice, the money is turned into -40 which is not allowed.</p><h3 name="da88" id="da88" class="graf graf--h3 graf-after--p">Total Solution</h3><p name="e5d3" id="e5d3" class="graf graf--p graf-after--h3">In addition to use the atomic update to modify the money, we still need some tricks to refrain from the negative values. My personal recommendation is to define the column, money, as an unsigned integer. Besides, use the transaction to protect the transfer. The final solution of this article is:</p><pre name="1bdc" id="1bdc" class="graf graf--pre graf-after--p"><code class="markup--code markup--pre-code">`start transaction`<br>A_owned = `select money from bank where name = A`<br>if A_owned &gt;= 70:<br>    `update bank set money = money - 70 where name = A`<br>    `update bank set money = money + 70 where name = B`<br>`commit`</code></pre><p name="5d91" id="5d91" class="graf graf--p graf-after--pre graf--trailing">Change two updates to the atomic update, and use transaction to guard the whole operation. Even if <code class="markup--code markup--p-code">if A_owned &gt;= 70</code> cannot stop <code class="markup--code markup--p-code">A2</code>, <code class="markup--code markup--p-code">A2</code> will still get the failure due to the unsigned column. The transaction will be failed, and <code class="markup--code markup--p-code">B</code> won’t receive the money does not belong to him.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/3f397b2b08e4"><time class="dt-published" datetime="2021-07-21T09:22:41.931Z">July 21, 2021</time></a>.</p><p><a href="https://medium.com/@lazypro/how-to-avoid-the-race-condition-and-the-negative-value-3f397b2b08e4" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

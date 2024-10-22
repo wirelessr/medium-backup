@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Game Prototype</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Game Prototype</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Yesterday, I told I want to develop a game, and I draw a blueprint:
+</section>
+<section data-field="body" class="e-content">
+<section name="bc60" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="31b4" id="31b4" class="graf graf--h3 graf--leading graf--title">Game Prototype</h3><p name="68cb" id="68cb" class="graf graf--p graf-after--h3">Yesterday, I told I want to develop a game, and I draw a blueprint:</p><figure name="4bbd" id="4bbd" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*S2CVQBbteyG9y3QF4kmWog.png" data-width="757" data-height="523" src="https://cdn-images-1.medium.com/max/800/1*S2CVQBbteyG9y3QF4kmWog.png"><figcaption class="imageCaption">pBlueprint</figcaption></figure><p name="07eb" id="07eb" class="graf graf--p graf-after--figure">The game is web based and like a RPG. The player can control a character with several skills, and those skills come from his job. There are two kinds of jobs: attack by weapon or by magic. The player can pick 8 skills on the desk and fight to an enemy. If you win this enemy, you can get some experiences, money, and items. The goal of this game is to defeat the final boss.</p><p name="397d" id="397d" class="graf graf--p graf-after--p">The code flow is like:</p><figure name="ba86" id="ba86" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*KmJheSZXw92KaYpwUl-SVw.png" data-width="584" data-height="518" src="https://cdn-images-1.medium.com/max/800/1*KmJheSZXw92KaYpwUl-SVw.png"></figure><p name="fa0b" id="fa0b" class="graf graf--p graf-after--figure">To reduce the traffic between the frontend and the backend, the game loop is in browser, but the status and gaming engine are in backend. Therefore, the backend can determine what the enemy you encounter and what rewards you will receive.</p><p name="1089" id="1089" class="graf graf--p graf-after--p graf--trailing">The communication between the browser and the backend is session, and I will use an encrypted cookie to keep the game states. However, I am not sure this method is secure enough or not. If you have the better idea, please tell me.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/f91a341e7417"><time class="dt-published" datetime="2018-06-14T13:13:23.671Z">June 14, 2018</time></a>.</p><p><a href="https://medium.com/@lazypro/game-prototype-f91a341e7417" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

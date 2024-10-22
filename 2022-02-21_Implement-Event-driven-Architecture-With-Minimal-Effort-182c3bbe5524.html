@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Implement Event-driven Architecture With Minimal Effort</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">Implement Event-driven Architecture With Minimal Effort</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Temporal coupling is the most overlooked pitfall.
+</section>
+<section data-field="body" class="e-content">
+<section name="d7cc" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="d334" id="d334" class="graf graf--h3 graf--leading graf--title">Implement Event-driven Architecture With Minimal Effort</h3><h4 name="824b" id="824b" class="graf graf--h4 graf-after--h3 graf--subtitle"><em class="markup--em markup--h4-em">Temporal coupling is the most overlooked pitfall</em></h4><figure name="dee3" id="dee3" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="0*WLldaPqvSOjRmN8s" data-width="9504" data-height="6336" data-unsplash-photo-id="8qEB0fTe9Vw" src="https://cdn-images-1.medium.com/max/800/0*WLldaPqvSOjRmN8s"><figcaption class="imageCaption">Photo by <a href="https://unsplash.com/@afgprogrammer?utm_source=medium&amp;utm_medium=referral" data-href="https://unsplash.com/@afgprogrammer?utm_source=medium&amp;utm_medium=referral" class="markup--anchor markup--figure-anchor" rel="photo-creator noopener" target="_blank">Mohammad Rahmani</a> on <a href="https://unsplash.com?utm_source=medium&amp;utm_medium=referral" data-href="https://unsplash.com?utm_source=medium&amp;utm_medium=referral" class="markup--anchor markup--figure-anchor" rel="photo-source noopener" target="_blank">Unsplash</a></figcaption></figure><p name="0789" id="0789" class="graf graf--p graf-after--figure">Last time, we <a href="https://betterprogramming.pub/temporal-coupling-in-code-e74899f7a48f" data-href="https://betterprogramming.pub/temporal-coupling-in-code-e74899f7a48f" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">explained that temporal coupling</a> can be effectively solved through event-driven architecture. Among them, we discussed the three approaches separately. Starting with the lowest reliability, simply using the event emitter can solve most of the cases with the least effort; secondly, in order to further improve the reliability, a message queue can be introduced to ensure that the event will be executed at least once. Finally, implement event sourcing to ensure that events are not lost at all.</p><p name="af95" id="af95" class="graf graf--p graf-after--p">Nevertheless, in organizations with some resource constraints, message queues seem to be out of reach. The resources here include human resources and organizational budget, whether there is no extra manpower to maintain a new messaging service or no extra funds to start a messaging service. Message queuing is one of the high price systems in restricted organizations.</p><p name="2829" id="2829" class="graf graf--p graf-after--p">Therefore, in this article, I will introduce how to achieve decoupling through event-driven architecture with minimal resources.</p><h3 name="5b15" id="5b15" class="graf graf--h3 graf-after--p">System Overview</h3><p name="8792" id="8792" class="graf graf--p graf-after--h3">Why this topic is born? Because one of our products belongs to this restricted organization. Therefore, in the process of system evolution, we gradually improve the reliability by making lots of design decisions.</p><figure name="35fd" id="35fd" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="1*K25enigwiBGTjRrQnfCPDQ.png" data-width="660" data-height="273" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*K25enigwiBGTjRrQnfCPDQ.png"></figure><p name="6990" id="6990" class="graf graf--p graf-after--figure">The overall architecture above is the final look of our system. We can see from the picture, there is no message queue. Even so, we still achieve high reliability. At least, if something goes wrong, there is a way to recover.</p><p name="59b1" id="59b1" class="graf graf--p graf-after--p">The components, alert manager, crontab and DB are all existing in the system, and no additional components are added. We just split the unit originally executed by a function into an emitter and a handler.</p><p name="b60a" id="b60a" class="graf graf--p graf-after--p">In the next section, I’ll explain how we did it step by step.</p><h3 name="5910" id="5910" class="graf graf--h3 graf-after--p">System Evolution</h3><p name="005e" id="005e" class="graf graf--p graf-after--h3">The entire system evolution process has gone through four stages, and we have gradually improved the reliability of the entire system.</p><ul class="postList"><li name="3dd8" id="3dd8" class="graf graf--li graf-after--p">Best effort: In the beginning, we simply split the function into emitter and handler, that’s all. This is the most basic practice, all events are fire-and-forget. Of course, if there is no accident occurred, such an implementation is actually not bad. Decoupling can be done with minimal resources. But as mentioned in the previous article, there are two main problems, <strong class="markup--strong markup--li-strong">event loss</strong> and <strong class="markup--strong markup--li-strong">emit loss</strong>.</li><li name="464b" id="464b" class="graf graf--li graf-after--li">Integrate with Alert Manager: Then we add an alert when the handler fails to execute. By writing the necessary information into <code class="markup--code markup--li-code">Elastic Search</code> and presenting it on <code class="markup--code markup--li-code">Kibana</code>, the person in charge can take corresponding actions after receiving an alert from slack. That is to say, we resolve <strong class="markup--strong markup--li-strong">event loss</strong> through manual recovery.</li></ul><figure name="4e76" id="4e76" class="graf graf--figure graf-after--li"><img class="graf-image" data-image-id="1*iOo7d75YrvR94pEsY9U0LA.png" data-width="558" data-height="268" src="https://cdn-images-1.medium.com/max/800/1*iOo7d75YrvR94pEsY9U0LA.png"></figure><ul class="postList"><li name="00e2" id="00e2" class="graf graf--li graf-after--figure">Event sourcing: In order to track events more completely to avoid <strong class="markup--strong markup--li-strong">event loss</strong> and <strong class="markup--strong markup--li-strong">emit loss</strong>, we use the existing database to implement a simplified version of event sourcing. Before emitting the event, the emitter writes a metadata into the database and marks the expected handler. If the writing to the database fails, it is regarded as an event emission failure, and the alert manager will be triggered. The handler also updates itself into the database when it completes the event. For the example mentioned above, the metadata of the event looks like this:</li></ul><pre name="ce9d" id="ce9d" class="graf graf--pre graf-after--li"><code class="markup--code markup--pre-code">{<br>    eventName: &quot;purchased&quot;,<br>    createAt: &quot;2022/01/01 1:11:11&quot;,<br>    expected: [&quot;giveCoupon&quot;, &quot;lottery&quot;],<br>    status: 0, // 0: emitted, 1: timeout, 2: processed<br>    done: [],<br>    args: [&quot;user A&quot;, 5000]<br>}</code></pre><figure name="ca96" id="ca96" class="graf graf--figure graf-after--pre"><img class="graf-image" data-image-id="1*EURDW5EBuwGQbdqIsU692A.png" data-width="660" data-height="198" src="https://cdn-images-1.medium.com/max/800/1*EURDW5EBuwGQbdqIsU692A.png"></figure><ul class="postList"><li name="6a8b" id="6a8b" class="graf graf--li graf-after--figure">Apply crontab plus event idempotency: At this moment, it is the same as the previous complete architecture diagram. All the above steps have a fatal flaw, and it needs to be manually recovered by humans. Although this can make sure that the problem can be solved eventually, the mean time to recovery (MTTR) will be pretty long. Therefore, the entire recovery mechanism can be further enhanced, through the workflow event pattern introduced in <a href="https://lazypro.medium.com/design-patterns-of-event-driven-architecture-bf0121cfda7b" data-href="https://lazypro.medium.com/design-patterns-of-event-driven-architecture-bf0121cfda7b" class="markup--anchor markup--li-anchor" rel="noopener" target="_blank">my previous article</a>. Periodically check which events are not executed correctly through a crontab, and then rerun it.</li></ul><p name="7e65" id="7e65" class="graf graf--p graf-after--li">There are two important points worth noting. First, the processing of each event must be idempotent, which is very important even when using message queues. Because message queues provide the guarantee of at-least-once, not exactly-once. Second, even with idempotency, there should be an upper bound on retries. If the retry fails several times, we still have to notify the person in charge to deal with follow-up matters.</p><h3 name="b871" id="b871" class="graf graf--h3 graf-after--p">Trade-off</h3><p name="d596" id="d596" class="graf graf--p graf-after--h3">In fact, the above architecture has a lot to discuss. For example,</p><ul class="postList"><li name="9226" id="9226" class="graf graf--li graf-after--p">Know which handlers are expected when the emitter writes to the database. In other words, the emitter is somehow coupled to the handler. However, in my opinion, such coupling is acceptable. As long as the coupling can be reduced through appropriate coding, for instance, there is a global mapping table to have the relationship between each event and handlers, so this can be regarded as a configuration rather than a coupling.</li><li name="a114" id="a114" class="graf graf--li graf-after--li">Retry in the handler instead of crontab. Each has its own advantages. Retrying in the handler can recover the error as soon as possible, but sometimes the main reason for the failure of the handler is database congestion, and retrying immediately will further increase the load on the database.</li><li name="6c0e" id="6c0e" class="graf graf--li graf-after--li">The data are inconsistent. The handler executes successfully but the update fails. Using idempotency to ensure that even repeated execution will not cause problems. On the other hand, the task of the emitter is executed successfully but fails to write to the database, which has to be re-emitted manually. This can be done with a more complex mechanism to implement automatic retries, but at the cost of more complexity, I don’t feel it’s worth it for the corner case where the write fails.</li></ul><h3 name="e0f3" id="e0f3" class="graf graf--h3 graf-after--li">Conclusion</h3><p name="de8d" id="de8d" class="graf graf--p graf-after--h3">In this article, we discuss some of the trade-offs some restricted organizations face with event-driven architecture. It has to be said that event-driven architecture itself is a highly complex architecture, and whether it is really suitable in small organizations has always been a matter of debate. However, this article provides a simple way to implement event-driven architecture on a small system. In addition to not creating new components, it does not generate too much coding complexity, and it is an easy-to-practice implementation.</p><p name="62e8" id="62e8" class="graf graf--p graf-after--p">Still, it’s not easy to find the right approach for each organization in this long list of design decisions. Behind every straightforward answer, there are many considerations and possible risks. When I’m designing a system, especially a distributed system, I always remind myself to be careful with FLP Theorem.</p><blockquote name="e68b" id="e68b" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">No completely asynchronous consensus protocol can tolerate even a single unannounced process death</em></blockquote><p name="c723" id="c723" class="graf graf--p graf-after--blockquote">In simple english, it is Murphy’s law.</p><blockquote name="f95b" id="f95b" class="graf graf--blockquote graf-after--p"><em class="markup--em markup--blockquote-em">Anything that can go wrong will go wrong.</em></blockquote><p name="f7a9" id="f7a9" class="graf graf--p graf-after--blockquote graf--trailing">How to be as reliable as possible with limited resources, whether in terms of time, manpower, or cost, is the most interesting part of system design.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/182c3bbe5524"><time class="dt-published" datetime="2022-02-21T01:16:29.079Z">February 21, 2022</time></a>.</p><p><a href="https://medium.com/@lazypro/implement-event-driven-architecture-with-minimal-effort-182c3bbe5524" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>

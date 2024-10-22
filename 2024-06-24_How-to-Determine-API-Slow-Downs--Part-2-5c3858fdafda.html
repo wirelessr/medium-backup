@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>How to Determine API Slow Downs, Part 2</title><style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field=subtitle],
+      section[data-field=description] {
+        display: none;
+      }
+      </style></head><body><article class="h-entry">
+<header>
+<h1 class="p-name">How to Determine API Slow Downs, Part 2</h1>
+</header>
+<section data-field="subtitle" class="p-summary">
+Understanding PELT algorithm and its applications in Change Point Detection
+</section>
+<section data-field="body" class="e-content">
+<section name="dfdb" class="section section--body section--first section--last"><div class="section-divider"><hr class="section-divider"></div><div class="section-content"><div class="section-inner sectionLayout--insetColumn"><h3 name="3153" id="3153" class="graf graf--h3 graf--leading graf--title">How to Determine API Slow Downs, Part 2</h3><h4 name="4617" id="4617" class="graf graf--h4 graf-after--h3 graf--subtitle">Understanding PELT algorithm and its applications in Change Point Detection</h4><figure name="b407" id="b407" class="graf graf--figure graf-after--h4"><img class="graf-image" data-image-id="1*1QPqZ7bdeZGT4o8qz4Da3Q.png" data-width="2032" data-height="1144" data-is-featured="true" src="https://cdn-images-1.medium.com/max/800/1*1QPqZ7bdeZGT4o8qz4Da3Q.png"><figcaption class="imageCaption">My girl</figcaption></figure><p name="1bfc" id="1bfc" class="graf graf--p graf-after--figure">A long time ago I wrote an article on <a href="https://medium.com/better-programming/how-to-know-api-is-slowing-down-2957b9e1341d" data-href="https://medium.com/better-programming/how-to-know-api-is-slowing-down-2957b9e1341d" class="markup--anchor markup--p-anchor" target="_blank">how to determine an API is slowing down</a> using simple statistics known as linear regression.</p><figure name="1ead" id="1ead" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*VhGPg5mEJPxhsfGR.png" data-width="688" data-height="456" src="https://cdn-images-1.medium.com/max/800/0*VhGPg5mEJPxhsfGR.png"></figure><p name="eac0" id="eac0" class="graf graf--p graf-after--figure">In the conclusion of that article, it was mentioned some challenges in applying linear regression.</p><ol class="postList"><li name="476b" id="476b" class="graf graf--li graf-after--p">It is hard to define the reference point.</li><li name="6f0b" id="6f0b" class="graf graf--li graf-after--li">Difficulty in defining the angle of the regression lines.</li></ol><p name="c8cc" id="c8cc" class="graf graf--p graf-after--li">The reference point means we need two regression lines to know whether the current situation is normal or abnormal, and the angle between the regression lines is the basis for our judgment.</p><p name="4dc1" id="4dc1" class="graf graf--p graf-after--p">For those who are familiar with statistics or math, this approach is a bit naive. In fact, I have not formally studied statistics, so I can only use the most straightforward approach, which has been proven to be feasible in practice, but the process of fine-tuning in the early stages will be tough.</p><p name="1a15" id="1a15" class="graf graf--p graf-after--p">After several years of continuous studies, I found a simpler way to do this, which is Changepoint Detection.</p><p name="572f" id="572f" class="graf graf--p graf-after--p">Before going into the details, let’s use a diagram to see what Changepoint Detection can do.</p><figure name="f3cd" id="f3cd" class="graf graf--figure graf-after--p"><img class="graf-image" data-image-id="0*f0Q-mScC-Bp2hGHR.png" data-width="800" data-height="435" src="https://cdn-images-1.medium.com/max/800/0*f0Q-mScC-Bp2hGHR.png"></figure><p name="3a6d" id="3a6d" class="graf graf--p graf-after--figure">The source code is linked <a href="https://gist.github.com/wirelessr/c2b6f6a6ec882bb1706ec5c26af8ad6d" data-href="https://gist.github.com/wirelessr/c2b6f6a6ec882bb1706ec5c26af8ad6d" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">here</a>.</p><p name="6a31" id="6a31" class="graf graf--p graf-after--p">As we can see from the diagram, our API slows down twice, and our tool detects the exact point in time. Although I have done smoothing here, in practice it is fine without it, only the detection thresholds need to be adjusted accordingly.</p><h3 name="1184" id="1184" class="graf graf--h3 graf-after--p">Solution Details</h3><p name="88de" id="88de" class="graf graf--p graf-after--h3">Originally we needed to solve two problems, but now we no longer need a reference point, so only the threshold needs to be defined. I have to say no matter what the mechanism is, thresholds are inevitable, to have an alarm is to need a threshold.</p><p name="36be" id="36be" class="graf graf--p graf-after--p">Well, let’s see how the magic happens.</p><pre data-code-block-mode="2" spellcheck="false" data-code-block-lang="python" name="fe2e" id="fe2e" class="graf graf--pre graf-after--p graf--preV2"><span class="pre--content">model = Pelt(model=<span class="hljs-string">&quot;rbf&quot;</span>).fit(np.array(df[<span class="hljs-string">&#x27;smoothed_latency&#x27;</span>]).reshape(-<span class="hljs-number">1</span>, <span class="hljs-number">1</span>))<br />changepoints = model.predict(pen=<span class="hljs-number">5</span>)</span></pre><p name="b2ff" id="b2ff" class="graf graf--p graf-after--pre">The source code is a bit long, but the core of the program is these two lines.</p><p name="b5e6" id="b5e6" class="graf graf--p graf-after--p">We use a famous Changepoint Detection algorithm: Pruned Exact Linear Time aka <a href="https://arxiv.org/pdf/1101.1438" data-href="https://arxiv.org/pdf/1101.1438" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">PELT</a>. This is the algorithm proposed by Killick in 2012.</p><p name="9fb0" id="9fb0" class="graf graf--p graf-after--p">The whole process is actually three steps.</p><ol class="postList"><li name="0b7e" id="0b7e" class="graf graf--li graf-after--p">Decide what model to use, in this case we use <code class="markup--code markup--li-code">rbf</code>.</li><li name="13f8" id="13f8" class="graf graf--li graf-after--li">Feed data points into the model.</li><li name="825f" id="825f" class="graf graf--li graf-after--li">Predict the changes through the model.</li></ol><p name="1d99" id="1d99" class="graf graf--p graf-after--li">Let’s continue to break down these steps.</p><h3 name="863d" id="863d" class="graf graf--h3 graf-after--p">How to choose the right model?</h3><p name="2479" id="2479" class="graf graf--p graf-after--h3">In <code class="markup--code markup--p-code">ruptures.Pelt</code>, there are <a href="https://centre-borelli.github.io/ruptures-docs/code-reference/costs/costl1-reference/" data-href="https://centre-borelli.github.io/ruptures-docs/code-reference/costs/costl1-reference/" class="markup--anchor markup--p-anchor" rel="noopener" target="_blank">many models</a> (cost functions) are available, the following three are more commonly used.</p><h3 name="d8fe" id="d8fe" class="graf graf--h3 graf-after--p">l2（least squared deviation）</h3><p name="57d3" id="57d3" class="graf graf--p graf-after--h3">This model is useful mainly for scenarios where there is a change in the average and if there is a significant change in the average, then this model is good to use.</p><p name="b586" id="b586" class="graf graf--p graf-after--p">For example, if there is a significant increase in the average latency after a certain release, e.g. 100ms to 200ms, then <code class="markup--code markup--p-code">l2</code> can easily capture this version.</p><h3 name="cf12" id="cf12" class="graf graf--h3 graf-after--p">rbf（Radial Basis Function）</h3><p name="c9cb" id="c9cb" class="graf graf--p graf-after--h3"><code class="markup--code markup--p-code">rbf</code> is more commonly used in the case of irregular variations, such as where both the average and the trend are changing.</p><p name="3c10" id="3c10" class="graf graf--p graf-after--p">For example, a latency in a complex system can be affected by a number of factors, and <code class="markup--code markup--p-code">rbf</code> can be used to find the more &quot;subtle&quot; changes.</p><h3 name="156f" id="156f" class="graf graf--h3 graf-after--p">normal</h3><p name="363e" id="363e" class="graf graf--p graf-after--h3">The term <code class="markup--code markup--p-code">normal</code> refers to a normal distribution or Gaussian distribution. The key to a normal distribution is the mean and standard deviation, so this is used in the context of distributional change.</p><p name="3b06" id="3b06" class="graf graf--p graf-after--p">For example, network traffic during peak hours not only increases in average but also in volatility, which is a kind of distributional change.</p><h3 name="ca45" id="ca45" class="graf graf--h3 graf-after--p">How to set the penalty?</h3><p name="0c65" id="0c65" class="graf graf--p graf-after--h3">In the second line of the code, there is a <code class="markup--code markup--p-code">pen=5</code>, where <code class="markup--code markup--p-code">pen</code> refers to the penalty.</p><p name="96b1" id="96b1" class="graf graf--p graf-after--p">Briefly, the larger the penalty, the tighter the model will be, and the fewer changepoints can be found, and vice versa.</p><p name="08bd" id="08bd" class="graf graf--p graf-after--p">So it is still a matter of experimentation as to what value to set, just as we did with linear regression, where we needed to experiment with how to define the angle of the regression lines. Even with PELT, we still need to consider how to set the penalty.</p><h3 name="917c" id="917c" class="graf graf--h3 graf-after--p">Conclusion</h3><p name="5381" id="5381" class="graf graf--p graf-after--h3">In fact we want to do exactly the same thing as before, we want to detect when the API is slowing down and it is slowing down because of a defect.</p><p name="fc04" id="fc04" class="graf graf--p graf-after--p">At first, we used the angle between the two regression lines to determine this. But this approach, as we mentioned, requires a lot of experimentation to determine how to define the reference point and the threshold of the angle. Although the concept is simple and not difficult to implement, it is not easy to make it work in practice.</p><p name="db52" id="db52" class="graf graf--p graf-after--p">In order to reduce the number of experiments, we change the factors from two to one, and only need to determine the penalty through experiments, which is a necessary process no matter what solution is used. In other words, we have greatly reduced the complexity of the API monitoring system.</p><p name="cc91" id="cc91" class="graf graf--p graf-after--p">You may ask, don’t we need to experiment to choose the model? No, not at all.</p><p name="af53" id="af53" class="graf graf--p graf-after--p">Because these models have a clear purpose, as long as you know what patterns you want to check, you will naturally choose the corresponding model. The reason we chose <code class="markup--code markup--p-code">rbf</code> is because we want to know if the API is abnormal as it slows down, which involves not only the average change but also a lot of additional factors, and only <code class="markup--code markup--p-code">rbf</code> is more fitting.</p><p name="20fb" id="20fb" class="graf graf--p graf-after--p graf--trailing">The source code is quite simple, the core is the two lines introduced in this article. But I have to say, to be able to write these two lines requires a huge accumulation of knowledge, and I also deeply realize that programmer is not just about writing code ONCE AGAIN.</p></div></div></section>
+</section>
+<footer><p>By <a href="https://medium.com/@lazypro" class="p-author h-card">Chunting Wu</a> on <a href="https://medium.com/p/5c3858fdafda"><time class="dt-published" datetime="2024-06-24T01:26:29.345Z">June 24, 2024</time></a>.</p><p><a href="https://medium.com/@lazypro/how-to-determine-api-slow-downs-part-2-5c3858fdafda" class="p-canonical">Canonical link</a></p><p>Exported from <a href="https://medium.com">Medium</a> on October 21, 2024.</p></footer></article></body></html>
